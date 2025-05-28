@@ -6,3 +6,7 @@ __pycache__/
 
 # Gradio 相關
 .gradio/
+
+env
+ui-design-creation.mdc
+__pycache__
