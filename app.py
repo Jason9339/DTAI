@@ -12,17 +12,58 @@ def build_main_app():
         css="""
         .gradio-container {
             max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
         }
         .main-button {
-            height: 120px !important;
-            font-size: 18px !important;
+            height: 80px !important;
+            font-size: 16px !important;
             margin: 10px !important;
+            min-width: 200px !important;
         }
         .step-indicator {
             background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
             border-radius: 10px;
             padding: 15px;
             margin: 10px 0;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .main-content {
+            text-align: center;
+            max-width: 100%;
+        }
+        .progress-section {
+            text-align: center;
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .disclaimer-section {
+            text-align: center;
+            background: #fef7f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        h1, h2, h3 {
+            text-align: center !important;
+        }
+        .gr-markdown {
+            text-align: center;
+        }
+        .step-row {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            gap: 15px !important;
+        }
+        .step-column {
+            flex: 1 !important;
+            min-width: 0 !important;
         }
         """
     ) as app:
@@ -33,17 +74,17 @@ def build_main_app():
         current_page = gr.State("home")
         
         # 主頁面
-        with gr.Column(visible=True) as home_page:
+        with gr.Column(visible=True, elem_classes=["main-content"]) as home_page:
             gr.Markdown("""
             # 🏥 中醫食物寒熱辨識與體質分析系統
             
             結合現代AI技術與傳統中醫理論，為您提供個人化的養生建議
             
             ## 📋 使用流程
-            """)
+            """, elem_classes=["main-content"])
             
-            with gr.Row():
-                with gr.Column():
+            with gr.Row(elem_classes=["step-row"]):
+                with gr.Column(elem_classes=["step-column"]):
                     gr.Markdown("""
                     <div class="step-indicator">
                     <h3>🔸 第一步：體質分析</h3>
@@ -57,7 +98,7 @@ def build_main_app():
                         elem_classes=["main-button"]
                     )
                 
-                with gr.Column():
+                with gr.Column(elem_classes=["step-column"]):
                     gr.Markdown("""
                     <div class="step-indicator">
                     <h3>🔸 第二步：食物辨識</h3>
@@ -71,7 +112,7 @@ def build_main_app():
                         elem_classes=["main-button"]
                     )
                 
-                with gr.Column():
+                with gr.Column(elem_classes=["step-column"]):
                     gr.Markdown("""
                     <div class="step-indicator">
                     <h3>🔸 第三步：養生建議</h3>
@@ -91,7 +132,7 @@ def build_main_app():
             - ⭕ 體質分析：未完成
             - ⭕ 食物辨識：未完成
             - ⭕ 養生建議：未完成
-            """)
+            """, elem_classes=["progress-section"])
             
             gr.Markdown("""
             ---
@@ -101,11 +142,11 @@ def build_main_app():
             3. 所有功能都可以獨立使用
             
             ⚠️ **免責聲明：** 本系統僅供參考，不能替代專業醫療建議
-            """)
+            """, elem_classes=["disclaimer-section"])
         
         # 體質分析頁面
-        with gr.Column(visible=False) as constitution_page:
-            gr.Markdown("# 🏥 中醫體質分析")
+        with gr.Column(visible=False, elem_classes=["main-content"]) as constitution_page:
+            gr.Markdown("# 🏥 中醫體質分析", elem_classes=["main-content"])
             
             back_to_home_1 = gr.Button("🏠 返回主頁", variant="secondary")
             constitution_result_display, constitution_state_internal = build_constitution_analysis_page()
@@ -120,8 +161,8 @@ def build_main_app():
             )
         
         # 食物辨識頁面
-        with gr.Column(visible=False) as food_page:
-            gr.Markdown("# 🍎 食物辨識")
+        with gr.Column(visible=False, elem_classes=["main-content"]) as food_page:
+            gr.Markdown("# 🍎 食物辨識", elem_classes=["main-content"])
             
             back_to_home_2 = gr.Button("🏠 返回主頁", variant="secondary")
             food_result_display, food_state_internal = build_food_recognition_page()
@@ -136,8 +177,8 @@ def build_main_app():
             )
         
         # 養生建議頁面
-        with gr.Column(visible=False) as advice_page:
-            gr.Markdown("# 🌿 個人化養生建議")
+        with gr.Column(visible=False, elem_classes=["main-content"]) as advice_page:
+            gr.Markdown("# 🌿 個人化養生建議", elem_classes=["main-content"])
             
             back_to_home_3 = gr.Button("🏠 返回主頁", variant="secondary")
             build_health_advice_page(constitution_result_state, food_result_state)
