@@ -36,7 +36,7 @@ def generate_health_advice_with_llm(constitution_result: Dict, food_result: Dict
 """
         
         response = client.chat.completions.create(
-            model="groq/llama-3.3-70b-versatile",
+            model="groq:llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "你是一位經驗豐富的中醫師，擅長根據體質特點提供個人化養生建議。"},
                 {"role": "user", "content": prompt}

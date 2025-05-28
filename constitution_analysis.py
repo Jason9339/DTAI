@@ -73,7 +73,7 @@ def analyze_constitution_with_llm(answers: List[str]) -> Dict:
         
         # 調用 Groq API
         response = client.chat.completions.create(
-            model="groq/llama-3.3-70b-versatile",
+            model="groq:llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "你是一位專業的中醫師，擅長體質分析。請根據問卷回答進行準確的中醫體質分析。"},
                 {"role": "user", "content": prompt}

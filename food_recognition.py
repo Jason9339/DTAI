@@ -21,9 +21,8 @@ def classify_food_image(image: Image.Image) -> Dict:
     
     result = {
         "辨識食物": recognized_food,
+        "英文名": food_info.get("英文名", "unknown"),
         "五性屬性": food_info["五性"],
-        "歸經": food_info["歸經"],
-        "功效": food_info["功效"],
         "信心度": f"{random.randint(85, 98)}%"
     }
     

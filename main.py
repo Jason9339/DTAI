@@ -64,9 +64,10 @@ def classify_food_image(image: Image.Image) -> Dict:
     
     result = {
         "辨識食物": recognized_food,
+        "英文名": food_info.get("英文名", "unknown"),
         "五性屬性": food_info["五性"],
-        "歸經": food_info["歸經"],
-        "功效": food_info["功效"],
+        "歸經": food_info.get("歸經", "資料庫中無此資訊"),
+        "功效": food_info.get("功效", "資料庫中無此資訊"),
         "信心度": f"{random.randint(85, 98)}%"
     }
     
@@ -287,7 +288,7 @@ def analyze_constitution_with_llm(answers: List[str]) -> Dict:
         
         # 調用 Groq API
         response = client.chat.completions.create(
-            model="groq/llama-3.3-70b-versatile",
+            model="groq:llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "你是一位專業的中醫師，擅長體質分析。請根據問卷回答進行準確的中醫體質分析。"},
                 {"role": "user", "content": prompt}
@@ -437,7 +438,7 @@ def generate_health_advice_with_llm(constitution_result: Dict, food_result: Dict
 """
         
         response = client.chat.completions.create(
-            model="groq/llama-3.3-70b-versatile",
+            model="groq:llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "你是一位經驗豐富的中醫師，擅長根據體質特點提供個人化養生建議。"},
                 {"role": "user", "content": prompt}

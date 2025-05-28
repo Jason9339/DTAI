@@ -11,6 +11,8 @@ DTAI/
 ├── food_recognition.py       # 食物辨識模組
 ├── constitution_analysis.py  # 體質分析模組
 ├── health_advice.py         # 養生建議生成模組
+├── food_database.csv        # 食物資料庫（CSV格式）
+├── test_system.py           # 系統測試腳本
 ├── requirements.txt         # 依賴包列表
 ├── README.md               # 項目說明文件
 └── PROJECT_STRUCTURE.md    # 本文件
@@ -25,9 +27,19 @@ DTAI/
 - **運行方式**: `python3 app.py`
 
 ### `config.py` - 配置文件
-- 中醫食物屬性資料庫 (`FOOD_DATABASE`)
+- 中醫食物屬性資料庫載入函數 (`load_food_database_from_csv()`)
 - 體質類型定義 (`CONSTITUTION_TYPES`)
 - 20題體質問卷 (`CONSTITUTION_QUESTIONS`)
+
+### `food_database.csv` - 食物資料庫
+- CSV格式：`English,Chinese,FiveNature`
+- 範例：`apple,蘋果,平性`
+- 支援自定義擴展，系統會自動根據五性屬性配置歸經和功效
+
+### `test_system.py` - 系統測試腳本
+- 測試各模組是否正常載入
+- 驗證食物辨識、體質分析、養生建議功能
+- 檢查 API 配置狀態
 
 ### `utils.py` - 工具函數
 - AI 客戶端初始化 (`get_ai_client()`)
