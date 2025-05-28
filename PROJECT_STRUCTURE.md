@@ -1,11 +1,12 @@
 # 項目結構說明
 
-## 📁 文件組織
+## 📁 文件結構
 
 ```
 DTAI/
-├── app.py                    # 主應用程式入口
-├── main.py                   # 舊版單文件應用（已重構）
+├── app.py                    # 主應用程式入口（模組化版本）
+├── main.py                   # 主應用程式（導航式UI版本）
+├── main_old.py              # 舊版單文件應用（備份）
 ├── config.py                 # 配置文件（常量、資料庫、問卷）
 ├── utils.py                  # 工具函數（AI 客戶端初始化）
 ├── food_recognition.py       # 食物辨識模組
@@ -18,13 +19,23 @@ DTAI/
 └── PROJECT_STRUCTURE.md    # 本文件
 ```
 
-## 🔧 模組說明
+## 🎯 核心模組說明
 
-### `app.py` - 主應用程式
-- 整合所有功能模組
-- 建立 Gradio 界面
-- 處理模組間的狀態傳遞
-- **運行方式**: `python3 app.py`
+### `app.py` - 主應用程式（模組化版本）
+- 使用模組化設計，導入各功能模組
+- 採用主頁面導航UI，無頂部標籤欄
+- 支援進度追蹤和狀態管理
+- 美觀的按鈕設計和響應式布局
+
+### `main.py` - 主應用程式（導航式UI版本）
+- 與app.py功能相同，但使用不同的實現方式
+- 同樣採用主頁面導航設計
+- 可作為app.py的替代版本
+
+### `main_old.py` - 舊版應用（備份）
+- 原始的單文件應用程式
+- 使用頂部標籤欄設計
+- 保留作為參考和備份
 
 ### `config.py` - 配置文件
 - 中醫食物屬性資料庫載入函數 (`load_food_database_from_csv()`)
@@ -43,65 +54,96 @@ DTAI/
 
 ### `utils.py` - 工具函數
 - AI 客戶端初始化 (`get_ai_client()`)
-- 環境變數載入
-- 共用工具函數
+- 支援 aisuite + Groq API 整合
 
 ### `food_recognition.py` - 食物辨識模組
-- 食物圖片辨識功能 (`classify_food_image()`)
-- 食物辨識頁面建構 (`build_food_recognition_page()`)
-- 返回辨識結果和狀態
+- 食物圖片辨識功能（目前為模擬實現）
+- 返回食物名稱、五性屬性、信心度
+- 預留深度學習模型接口
 
 ### `constitution_analysis.py` - 體質分析模組
-- AI 體質分析功能 (`analyze_constitution_with_llm()`)
-- 問卷處理和 prompt 生成
-- 體質分析頁面建構 (`build_constitution_analysis_page()`)
-- API Key 設置功能
+- 20題問卷處理邏輯
+- AI 驅動的體質分析（使用 Groq Llama-3.3-70B）
+- 支援混合體質分析
 
 ### `health_advice.py` - 養生建議生成模組
-- AI 養生建議生成 (`generate_health_advice_with_llm()`)
-- 結合體質和食物資訊
-- 養生建議頁面建構 (`build_health_advice_page()`)
+- 結合體質分析和食物辨識結果
+- AI 生成個人化養生建議
+- 包含飲食、生活作息、運動等建議
 
-## 🚀 使用方式
+## 🎨 UI 設計特色
 
-### 開發模式
-```bash
-# 運行新的模組化版本
-python3 app.py
+### 主頁面導航
+- **設計理念**：清晰的流程指引，避免標籤欄混亂
+- **三步驟流程**：
+  1. 🏥 體質分析（第一步）
+  2. 🍎 食物辨識（第二步）  
+  3. 🌿 養生建議（第三步）
 
-# 或運行舊版單文件版本
-python3 main.py
-```
+### 視覺元素
+- **按鈕設計**：大型按鈕（120px高度），清晰的圖標
+- **進度指示**：實時顯示完成狀態
+- **色彩搭配**：漸層背景，現代化設計
+- **響應式布局**：適配不同螢幕尺寸
 
-### 模組導入
-```python
-# 在其他項目中使用
-from food_recognition import classify_food_image
-from constitution_analysis import analyze_constitution
-from health_advice import generate_health_advice
-```
+### 用戶體驗
+- **狀態管理**：全局狀態追蹤，數據在頁面間共享
+- **進度追蹤**：主頁面顯示當前完成進度
+- **靈活使用**：支援任意順序使用各功能
+- **返回導航**：每個頁面都有返回主頁按鈕
 
-## 🔄 狀態管理
+## 🔧 技術架構
 
-各模組通過 Gradio State 組件進行狀態傳遞：
+### 前端技術
+- **框架**：Gradio 4.0+
+- **狀態管理**：gr.State() 全局狀態
+- **頁面切換**：gr.update() 動態顯示/隱藏
+- **CSS 自定義**：自定義樣式提升視覺效果
 
-1. **食物辨識** → `food_result_state`
-2. **體質分析** → `constitution_result_state`
-3. **養生建議** ← 接收前兩個狀態
+### 後端技術
+- **AI 整合**：aisuite + Groq API
+- **模型**：Llama-3.3-70B-versatile
+- **資料處理**：CSV 讀取，JSON 格式化
+- **錯誤處理**：完善的異常捕獲機制
 
-## 📦 依賴管理
+### 部署方式
+- **本地運行**：`python3 app.py` 或 `python3 main.py`
+- **分享功能**：Gradio `share=True` 自動生成公開連結
+- **環境配置**：支援 `.env` 文件和環境變數
 
-所有依賴統一在 `requirements.txt` 中管理：
-- `gradio>=4.0.0` - Web 界面框架
-- `aisuite>=0.1.0` - AI 模型統一接口
-- `python-dotenv>=0.19.0` - 環境變數管理
-- `Pillow>=9.0.0` - 圖片處理
-- `docstring_parser>=0.16` - aisuite 依賴
+## 🚀 使用建議
 
-## 🎯 優勢
+### 開發者
+- 使用 `app.py` 進行功能開發和測試
+- 使用 `test_system.py` 驗證系統狀態
+- 參考 `main_old.py` 了解原始實現
 
-1. **模組化設計**: 每個功能獨立，易於維護和擴展
-2. **清晰分離**: 配置、工具、業務邏輯分離
-3. **可重用性**: 各模組可獨立使用
-4. **易於測試**: 每個模組可單獨測試
-5. **團隊協作**: 不同開發者可負責不同模組 
+### 用戶
+- 建議按順序完成：體質分析 → 食物辨識 → 養生建議
+- 首次使用需要設置 Groq API Key
+- 可以獨立使用任何單一功能
+
+### 部署
+- 確保安裝所有依賴：`pip install -r requirements.txt`
+- 設置環境變數：`export GROQ_API_KEY=your_key`
+- 運行應用：`python3 app.py`
+
+## 📈 未來擴展
+
+### 功能增強
+- [ ] 整合真實的深度學習食物辨識模型
+- [ ] 擴充食物資料庫規模
+- [ ] 增加更多體質評估維度
+- [ ] 支援歷史記錄和用戶檔案
+
+### UI/UX 改進
+- [ ] 添加動畫效果
+- [ ] 支援深色模式
+- [ ] 移動端優化
+- [ ] 多語言支援
+
+### 技術升級
+- [ ] 資料庫持久化
+- [ ] 用戶認證系統
+- [ ] API 接口開發
+- [ ] 容器化部署 

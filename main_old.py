@@ -7,9 +7,6 @@ import os
 from PIL import Image
 from datetime import datetime
 from dotenv import load_dotenv
-from food_recognition import build_food_recognition_page
-from constitution_analysis import build_constitution_analysis_page
-from health_advice import build_health_advice_page
 
 # 載入環境變數
 load_dotenv()
@@ -69,6 +66,8 @@ def classify_food_image(image: Image.Image) -> Dict:
         "辨識食物": recognized_food,
         "英文名": food_info.get("英文名", "unknown"),
         "五性屬性": food_info["五性"],
+        "歸經": food_info.get("歸經", "資料庫中無此資訊"),
+        "功效": food_info.get("功效", "資料庫中無此資訊"),
         "信心度": f"{random.randint(85, 98)}%"
     }
     
@@ -394,13 +393,35 @@ def build_constitution_analysis_page():
             result = analyze_constitution(answers)
             return result, result
         
+        constitution_state = gr.State()
+        
+        def process_and_update(*inputs):
+            """處理問卷答案並更新狀態"""
+            answers = []
+            
+            # 處理選擇題（可複選）
+            for i in range(15):
+                selected = inputs[i] if inputs[i] else []
+                if selected:
+                    answers.append(", ".join(selected))
+                else:
+                    answers.append("無特別異常")  # 預設答案
+            
+            # 處理簡答題
+            for i in range(15, 20):
+                text_answer = inputs[i] if inputs[i] and inputs[i].strip() else "無特別說明"
+                answers.append(text_answer)
+            
+            result = analyze_constitution(answers)
+            return result, result
+        
         analyze_btn.click(
-            fn=process_answers,
+            fn=process_and_update,
             inputs=question_components,
-            outputs=[constitution_result_display, constitution_result_state]
+            outputs=[constitution_result_display, constitution_state]
         )
         
-        return constitution_result_display, constitution_result_state
+        return constitution_result_display, constitution_state
 
 # --------------------------------------------------------------------------
 # 3. 養生建議生成模組
@@ -476,220 +497,160 @@ def build_main_app():
         .gradio-container {
             max-width: 1200px !important;
         }
-        .main-button {
-            height: 120px !important;
-            font-size: 18px !important;
-            margin: 10px !important;
-        }
-        .step-indicator {
-            background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-        }
         """
     ) as app:
         
-        # 全局狀態管理
-        constitution_result_state = gr.State()
-        food_result_state = gr.State()
-        current_page = gr.State("home")
+        gr.Markdown("""
+        # 🏥 中醫食物寒熱辨識與體質分析系統
         
-        # 主頁面
-        with gr.Column(visible=True) as home_page:
-            gr.Markdown("""
-            # 🏥 中醫食物寒熱辨識與體質分析系統
-            
-            結合現代AI技術與傳統中醫理論，為您提供個人化的養生建議
-            
-            ## 📋 使用流程
-            """)
-            
-            with gr.Row():
-                with gr.Column():
-                    gr.Markdown("""
-                    <div class="step-indicator">
-                    <h3>🔸 第一步：體質分析</h3>
-                    <p>完成20題中醫體質問卷，AI將分析您的體質類型</p>
-                    </div>
-                    """)
-                    constitution_btn = gr.Button(
-                        "🏥 開始體質分析", 
-                        variant="primary", 
-                        size="lg",
-                        elem_classes=["main-button"]
-                    )
+        結合現代AI技術與傳統中醫理論，為您提供個人化的養生建議
+        """)
+        
+        with gr.Tabs():
+            # Tab 1: 食物辨識
+            with gr.Tab("🍎 食物辨識"):
+                food_result_state = gr.State()
                 
                 with gr.Column():
-                    gr.Markdown("""
-                    <div class="step-indicator">
-                    <h3>🔸 第二步：食物辨識</h3>
-                    <p>上傳食物圖片，系統將辨識食材的中醫屬性</p>
-                    </div>
-                    """)
-                    food_btn = gr.Button(
-                        "🍎 食物辨識", 
-                        variant="secondary", 
-                        size="lg",
-                        elem_classes=["main-button"]
+                    gr.Markdown("## 食物辨識模組")
+                    gr.Markdown("上傳食物圖片，系統將辨識食材並提供中醫五性屬性資訊")
+                    
+                    with gr.Row():
+                        with gr.Column():
+                            food_image = gr.Image(
+                                type="pil", 
+                                label="請上傳食物照片",
+                                height=300
+                            )
+                            recognize_btn = gr.Button("🔍 開始辨識", variant="primary")
+                        
+                        with gr.Column():
+                            food_result_display = gr.JSON(label="辨識結果")
+                    
+                    def update_food_result(image):
+                        result = classify_food_image(image)
+                        return result, result
+                    
+                    recognize_btn.click(
+                        fn=update_food_result,
+                        inputs=[food_image],
+                        outputs=[food_result_display, food_result_state]
                     )
+            
+            # Tab 2: 體質分析
+            with gr.Tab("🏥 體質分析"):
+                constitution_result_state = gr.State()
                 
                 with gr.Column():
-                    gr.Markdown("""
-                    <div class="step-indicator">
-                    <h3>🔸 第三步：養生建議</h3>
-                    <p>基於體質和食物分析，獲得個人化養生建議</p>
-                    </div>
-                    """)
-                    advice_btn = gr.Button(
-                        "🌿 養生建議", 
-                        variant="secondary", 
-                        size="lg",
-                        elem_classes=["main-button"]
+                    gr.Markdown("## 🏥 中醫體質分析")
+                    gr.Markdown("請完成以下20題問卷，系統將使用AI分析您的中醫體質類型")
+                    
+                    # API Key 設置
+                    with gr.Row():
+                        api_key_input = gr.Textbox(
+                            label="🔑 Groq API Key",
+                            placeholder="請輸入您的 Groq API Key（可選，如已設置環境變數則不需要）",
+                            type="password",
+                            scale=3
+                        )
+                        set_key_btn = gr.Button("設置", scale=1)
+                    
+                    # 創建問題組件
+                    question_components = []
+                    
+                    gr.Markdown("### 📋 選擇題（1-15題）")
+                    for i, q in enumerate(CONSTITUTION_QUESTIONS[:15]):  # 前15題是選擇題
+                        question_components.append(
+                            gr.CheckboxGroup(
+                                choices=q["options"],
+                                label=f"{i+1}. {q['question']}",
+                                value=[]
+                            )
+                        )
+                    
+                    gr.Markdown("### ✍️ 簡答題（16-20題）")
+                    for i, q in enumerate(CONSTITUTION_QUESTIONS[15:], 15):  # 後5題是簡答題
+                        question_components.append(
+                            gr.Textbox(
+                                label=f"{i+1}. {q['question']}",
+                                placeholder=q["placeholder"],
+                                lines=2
+                            )
+                        )
+                    
+                    def set_api_key(key):
+                        if key.strip():
+                            os.environ['GROQ_API_KEY'] = key.strip()
+                            return "✅ API Key 已設置"
+                        return "❌ 請輸入有效的 API Key"
+                    
+                    set_key_status = gr.Textbox(label="狀態", interactive=False)
+                    set_key_btn.click(
+                        fn=set_api_key,
+                        inputs=[api_key_input],
+                        outputs=[set_key_status]
+                    )
+                    
+                    analyze_btn = gr.Button("🤖 AI 分析體質", variant="primary", size="lg")
+                    constitution_result_display = gr.JSON(label="AI 體質分析結果")
+                    
+                    def process_answers(*inputs):
+                        """處理問卷答案"""
+                        answers = []
+                        
+                        # 處理選擇題（可複選）
+                        for i in range(15):
+                            selected = inputs[i] if inputs[i] else []
+                            if selected:
+                                answers.append(", ".join(selected))
+                            else:
+                                answers.append("無特別異常")  # 預設答案
+                        
+                        # 處理簡答題
+                        for i in range(15, 20):
+                            text_answer = inputs[i] if inputs[i] and inputs[i].strip() else "無特別說明"
+                            answers.append(text_answer)
+                        
+                        result = analyze_constitution(answers)
+                        return result, result
+                    
+                    analyze_btn.click(
+                        fn=process_answers,
+                        inputs=question_components,
+                        outputs=[constitution_result_display, constitution_result_state]
                     )
             
-            # 進度顯示
-            progress_display = gr.Markdown("""
-            ### 📊 當前進度
-            - ⭕ 體質分析：未完成
-            - ⭕ 食物辨識：未完成
-            - ⭕ 養生建議：未完成
-            """)
-            
-            gr.Markdown("""
-            ---
-            💡 **使用說明：**
-            1. 建議按順序完成：體質分析 → 食物辨識 → 養生建議
-            2. 體質分析需要設置 Groq API Key
-            3. 所有功能都可以獨立使用
-            
-            ⚠️ **免責聲明：** 本系統僅供參考，不能替代專業醫療建議
-            """)
+            # Tab 3: 養生建議
+            with gr.Tab("🌿 養生建議"):
+                with gr.Column():
+                    gr.Markdown("## 個人化養生建議")
+                    gr.Markdown("基於您的體質分析和食物辨識結果，生成個人化養生建議")
+                    
+                    generate_advice_btn = gr.Button("🌿 生成養生建議", variant="primary")
+                    advice_output = gr.Markdown(label="養生建議")
+                    
+                    def get_advice(constitution_result, food_result):
+                        if not constitution_result:
+                            return "⚠️ 請先完成體質分析"
+                        if not food_result:
+                            return "⚠️ 請先完成食物辨識"
+                        return generate_health_advice(constitution_result, food_result)
+                    
+                    generate_advice_btn.click(
+                        fn=get_advice,
+                        inputs=[constitution_result_state, food_result_state],
+                        outputs=[advice_output]
+                    )
         
-        # 體質分析頁面
-        with gr.Column(visible=False) as constitution_page:
-            gr.Markdown("# 🏥 中醫體質分析")
-            
-            back_to_home_1 = gr.Button("🏠 返回主頁", variant="secondary")
-            constitution_result_display, constitution_state_internal = build_constitution_analysis_page()
-            
-            def update_constitution_state(result):
-                return result
-            
-            constitution_state_internal.change(
-                fn=update_constitution_state,
-                inputs=[constitution_state_internal],
-                outputs=[constitution_result_state]
-            )
+        gr.Markdown("""
+        ---
+        💡 **使用說明：**
+        1. 先在「食物辨識」頁面上傳食物圖片進行辨識
+        2. 在「體質分析」頁面完成體質問卷
+        3. 在「養生建議」頁面獲得個人化建議
         
-        # 食物辨識頁面
-        with gr.Column(visible=False) as food_page:
-            gr.Markdown("# 🍎 食物辨識")
-            
-            back_to_home_2 = gr.Button("🏠 返回主頁", variant="secondary")
-            food_result_display, food_state_internal = build_food_recognition_page()
-            
-            def update_food_state(result):
-                return result
-            
-            food_state_internal.change(
-                fn=update_food_state,
-                inputs=[food_state_internal],
-                outputs=[food_result_state]
-            )
-        
-        # 養生建議頁面
-        with gr.Column(visible=False) as advice_page:
-            gr.Markdown("# 🌿 個人化養生建議")
-            
-            back_to_home_3 = gr.Button("🏠 返回主頁", variant="secondary")
-            build_health_advice_page(constitution_result_state, food_result_state)
-        
-        # 頁面切換函數
-        def show_constitution_page():
-            return (
-                gr.update(visible=False),  # home_page
-                gr.update(visible=True),   # constitution_page
-                gr.update(visible=False),  # food_page
-                gr.update(visible=False),  # advice_page
-                "constitution"
-            )
-        
-        def show_food_page():
-            return (
-                gr.update(visible=False),  # home_page
-                gr.update(visible=False),  # constitution_page
-                gr.update(visible=True),   # food_page
-                gr.update(visible=False),  # advice_page
-                "food"
-            )
-        
-        def show_advice_page():
-            return (
-                gr.update(visible=False),  # home_page
-                gr.update(visible=False),  # constitution_page
-                gr.update(visible=False),  # food_page
-                gr.update(visible=True),   # advice_page
-                "advice"
-            )
-        
-        def show_home_page():
-            return (
-                gr.update(visible=True),   # home_page
-                gr.update(visible=False),  # constitution_page
-                gr.update(visible=False),  # food_page
-                gr.update(visible=False),  # advice_page
-                "home"
-            )
-        
-        def update_progress(constitution_result, food_result):
-            """更新進度顯示"""
-            constitution_status = "✅ 體質分析：已完成" if constitution_result else "⭕ 體質分析：未完成"
-            food_status = "✅ 食物辨識：已完成" if food_result else "⭕ 食物辨識：未完成"
-            advice_status = "✅ 養生建議：可生成" if (constitution_result and food_result) else "⭕ 養生建議：未完成"
-            
-            return f"""
-            ### 📊 當前進度
-            - {constitution_status}
-            - {food_status}
-            - {advice_status}
-            """
-        
-        # 綁定按鈕事件
-        constitution_btn.click(
-            fn=show_constitution_page,
-            outputs=[home_page, constitution_page, food_page, advice_page, current_page]
-        )
-        
-        food_btn.click(
-            fn=show_food_page,
-            outputs=[home_page, constitution_page, food_page, advice_page, current_page]
-        )
-        
-        advice_btn.click(
-            fn=show_advice_page,
-            outputs=[home_page, constitution_page, food_page, advice_page, current_page]
-        )
-        
-        # 返回主頁按鈕
-        for back_btn in [back_to_home_1, back_to_home_2, back_to_home_3]:
-            back_btn.click(
-                fn=show_home_page,
-                outputs=[home_page, constitution_page, food_page, advice_page, current_page]
-            )
-        
-        # 更新進度顯示
-        constitution_result_state.change(
-            fn=update_progress,
-            inputs=[constitution_result_state, food_result_state],
-            outputs=[progress_display]
-        )
-        
-        food_result_state.change(
-            fn=update_progress,
-            inputs=[constitution_result_state, food_result_state],
-            outputs=[progress_display]
-        )
+        ⚠️ **免責聲明：** 本系統僅供參考，不能替代專業醫療建議
+        """)
     
     return app
 
@@ -698,5 +659,4 @@ def build_main_app():
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
     app = build_main_app()
-    app.launch(share=True)
-
+    app.launch(share=True) 
