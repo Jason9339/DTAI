@@ -443,16 +443,40 @@ def build_main_app():
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
-        }        /* 主標題 */
+        }        /* 主標題 - 強化樣式確保字體大小生效 */
         .main-title {
-            color: #6A9A4E;
-            font-size: 4.8rem;
-            font-weight: 700;
-            margin-bottom: 30px;
-            line-height: 1.2;
-            position: relative;
-            display: inline-block;
-            text-align: center;
+            color: #6A9A4E !important;
+            font-size: 2.8rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 30px !important;
+            line-height: 1.2 !important;
+            position: relative !important;
+            display: inline-block !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        
+        /* 確保主標題在HTML內部也能正確顯示 */
+        .hero-section .main-title {
+            color: #6A9A4E !important;
+            font-size: 2.8rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 30px !important;
+            line-height: 1.2 !important;
+            text-align: center !important;
+            width: 100% !important;
+        }
+        
+        /* 覆蓋所有可能的Gradio樣式干擾 */
+        .gr-markdown .main-title,
+        h1.main-title,
+        [class*="main-title"] {
+            color: #6A9A4E !important;
+            font-size: 2.8rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 30px !important;
+            line-height: 1.2 !important;
+            text-align: center !important;
         }
         
         .main-title::after {
@@ -464,7 +488,8 @@ def build_main_app():
             height: 4px;
             background: #D4AF37;
             border-radius: 2px;
-        }/* 副標題 */
+        }
+        /* 副標題 */
         .subtitle {
             color: #2D5016 !important;
             font-size: 1.3rem;
@@ -863,7 +888,7 @@ def build_main_app():
                 min-height: 280px;
             }
             .main-title {
-                font-size: 3.5rem;
+                font-size: 2.5rem;
             }
             .hero-image, #main_vision {
                 max-width: 400px;
@@ -882,7 +907,7 @@ def build_main_app():
                 padding: 25px 20px;
             }
             .main-title {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
             }
             .subtitle {
                 font-size: 1.1rem;
