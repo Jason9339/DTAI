@@ -58,6 +58,64 @@ CONSTITUTION_TYPES = {
     "特稟質": "先天稟賦不足，過敏體質"
 }
 
+# 體質別名和圖片路徑映射
+CONSTITUTION_INFO = {
+    "平和體質": {
+        "alias": "曦光導者",
+        "nickname": "健康派",
+        "image_path": "assets/images/平和體質.png",
+        "description": "陰陽氣血調和，體質平和"
+    },
+    "氣虛體質": {
+        "alias": "虛風使者",
+        "nickname": "氣短派",
+        "image_path": "assets/images/氣虛體質.png",
+        "description": "元氣不足，易疲勞乏力"
+    },
+    "陽虛體質": {
+        "alias": "寒光守望者",
+        "nickname": "怕冷派",
+        "image_path": "assets/images/陽虛體質.png",
+        "description": "陽氣不足，畏寒怕冷"
+    },
+    "陰虛體質": {
+        "alias": "燄泉行者",
+        "nickname": "缺水派",
+        "image_path": "assets/images/陰虛體質.png",
+        "description": "陰液虧少，虛熱內擾"
+    },
+    "痰濕體質": {
+        "alias": "濁澤漫步者",
+        "nickname": "痰多派",
+        "image_path": "assets/images/痰濕體質.png",
+        "description": "痰濕凝聚，形體肥胖"
+    },
+    "濕熱體質": {
+        "alias": "焰痕旅客",
+        "nickname": "長痘派",
+        "image_path": "assets/images/濕熱體質.png",
+        "description": "濕熱內蘊，面垢油膩"
+    },
+    "血瘀體質": {
+        "alias": "夜凝旅人",
+        "nickname": "長斑派",
+        "image_path": "assets/images/瘀滯體質.png",
+        "description": "血行不暢，膚色晦暗"
+    },
+    "氣鬱體質": {
+        "alias": "思霧使徒",
+        "nickname": "鬱悶派",
+        "image_path": "assets/images/血虛體質.png",
+        "description": "氣機鬱滯，神情抑鬱"
+    },
+    "特稟體質": {
+        "alias": "異感覺醒者",
+        "nickname": "過敏派",
+        "image_path": "assets/images/特稟體質.png",
+        "description": "先天稟賦不足，過敏體質"
+    }
+}
+
 # 中醫體質混合型問卷（共20題）
 CONSTITUTION_QUESTIONS = [
     # 選擇題（15題）
