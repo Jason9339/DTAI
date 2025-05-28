@@ -4,16 +4,13 @@
 
 ```
 DTAI/
-├── app.py                    # 主應用程式入口（模組化版本）
-├── main.py                   # 主應用程式（導航式UI版本）
-├── main_old.py              # 舊版單文件應用（備份）
+├── app.py                    # 主應用程式入口
 ├── config.py                 # 配置文件（常量、資料庫、問卷）
 ├── utils.py                  # 工具函數（AI 客戶端初始化）
 ├── food_recognition.py       # 食物辨識模組
 ├── constitution_analysis.py  # 體質分析模組
 ├── health_advice.py         # 養生建議生成模組
 ├── food_database.csv        # 食物資料庫（CSV格式）
-├── test_system.py           # 系統測試腳本
 ├── requirements.txt         # 依賴包列表
 ├── README.md               # 項目說明文件
 └── PROJECT_STRUCTURE.md    # 本文件
@@ -21,21 +18,12 @@ DTAI/
 
 ## 🎯 核心模組說明
 
-### `app.py` - 主應用程式（模組化版本）
+### `app.py` - 主應用程式
 - 使用模組化設計，導入各功能模組
 - 採用主頁面導航UI，無頂部標籤欄
 - 支援進度追蹤和狀態管理
 - 美觀的按鈕設計和響應式布局
-
-### `main.py` - 主應用程式（導航式UI版本）
-- 與app.py功能相同，但使用不同的實現方式
-- 同樣採用主頁面導航設計
-- 可作為app.py的替代版本
-
-### `main_old.py` - 舊版應用（備份）
-- 原始的單文件應用程式
-- 使用頂部標籤欄設計
-- 保留作為參考和備份
+- 代碼結構清晰，易於維護
 
 ### `config.py` - 配置文件
 - 中醫食物屬性資料庫載入函數 (`load_food_database_from_csv()`)
@@ -46,11 +34,6 @@ DTAI/
 - CSV格式：`English,Chinese,FiveNature`
 - 範例：`apple,蘋果,平性`
 - 支援自定義擴展，系統會自動根據五性屬性配置歸經和功效
-
-### `test_system.py` - 系統測試腳本
-- 測試各模組是否正常載入
-- 驗證食物辨識、體質分析、養生建議功能
-- 檢查 API 配置狀態
 
 ### `utils.py` - 工具函數
 - AI 客戶端初始化 (`get_ai_client()`)
@@ -107,7 +90,7 @@ DTAI/
 - **錯誤處理**：完善的異常捕獲機制
 
 ### 部署方式
-- **本地運行**：`python3 app.py` 或 `python3 main.py`
+- **本地運行**：`python3 app.py`
 - **分享功能**：Gradio `share=True` 自動生成公開連結
 - **環境配置**：支援 `.env` 文件和環境變數
 
@@ -115,8 +98,7 @@ DTAI/
 
 ### 開發者
 - 使用 `app.py` 進行功能開發和測試
-- 使用 `test_system.py` 驗證系統狀態
-- 參考 `main_old.py` 了解原始實現
+- 模組化設計便於功能擴展
 
 ### 用戶
 - 建議按順序完成：體質分析 → 食物辨識 → 養生建議

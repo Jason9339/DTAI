@@ -56,9 +56,7 @@ pip install -r requirements.txt
 
 ### 運行應用
 ```bash
-python3 app.py   # 新版模組化應用
-# 或
-python3 main.py  # 主應用（導航式UI）
+python3 app.py
 ```
 
 系統將自動啟動並提供一個可分享的 Gradio 連結。
