@@ -25,8 +25,13 @@ def build_main_app():
     
     with gr.Blocks(
         title="中醫食物寒熱辨識與體質分析系統",
-        theme=gr.themes.Soft(),
-        head="""
+        theme=gr.themes.Soft().set(
+            body_background_fill="#F0F5F0",
+            background_fill_primary="#F0F5F0",
+            background_fill_secondary="#F0F5F0",
+            block_background_fill="#F0F5F0",
+            panel_background_fill="#F0F5F0"
+        ),head="""
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -35,8 +40,62 @@ def build_main_app():
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
         }
         </style>
-        """,
-        css="""
+        <style id="force-body-bg">
+        /* 強力覆蓋最外層背景 - 仿照成功案例 */
+        html, body {
+            background: #F0F5F0 !important;
+            background-color: #F0F5F0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        /* 針對Gradio可能的根元素 */
+        .gradio-app, gradio-app, .gradio-container, .contain,
+        #root, #gradio-root, [data-testid="main"], 
+        .app, .main, .container, .wrapper {
+            background: transparent !important;
+            background-color: transparent !important;
+        }
+        
+        /* 極端測試方案 - 強制所有body內元素背景透明 */
+        body * {
+            background-color: transparent !important;
+        }
+        
+        /* 然後重新設定需要背景的元素 */
+        .main-content {
+            background: #F8FBF6 !important;
+        }
+        
+        .feature-card {
+            background: #FEFCF8 !important;
+        }
+        
+        .workflow-step {
+            background: #f8fafc !important;
+        }
+        
+        .disclaimer-section {
+            background: #F8F5F0 !important;
+        }
+        
+        .usage-section {
+            background: #F0F7F0 !important;
+        }
+        
+        .progress-section {
+            background: #f8fafc !important;
+        }
+        
+        .progress-item {
+            background: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .step-number {
+            background: #6A9A4E !important;
+        }
+        </style>
+        <style>
         /* 確保SVG圖片正確顯示 */
         img[src*="data:image/svg+xml"] {
             max-width: 100% !important;
@@ -44,19 +103,17 @@ def build_main_app():
             display: block !important;
             border-radius: 15px !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        /* 主容器設計 - PC 優化 - 低多邊形橘褐色風格 */
+        }        /* 主容器設計 - 中醫風格 */
         .gradio-container {
-            max-width: 1400px !important;
-            margin: 0 auto !important;
-            padding: 40px !important;
-            background: #1F1B17 !important; /* 深黑褐色背景 */
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #F0F5F0 !important; /* 統一淺綠色背景 */
             min-height: 100vh;
             position: relative;
             overflow: hidden;
         }
-          /* 創建低多邊形背景圖案 */
+          /* 創建中醫風格背景圖案 */
         .gradio-container::before {
             content: "";
             position: absolute;
@@ -64,28 +121,28 @@ def build_main_app():
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, #2C1810 25%, transparent 25%), 
-                        linear-gradient(-45deg, #2C1810 25%, transparent 25%), 
-                        linear-gradient(45deg, transparent 75%, #2C1810 75%), 
-                        linear-gradient(-45deg, transparent 75%, #2C1810 75%);
-            background-size: 60px 60px;
-            background-position: 0 0, 0 30px, 30px -30px, -30px 0px;
-            opacity: 0.3;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(144, 180, 144, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(139, 69, 19, 0.08) 0%, transparent 40%),
+                linear-gradient(45deg, rgba(106, 153, 78, 0.1) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(106, 153, 78, 0.1) 25%, transparent 25%);
+            background-size: 150px 150px, 120px 120px, 200px 200px, 60px 60px, 60px 60px;
+            background-position: 0 0, 60px 60px, 100px 100px, 0 0, 30px 30px;
+            opacity: 0.5;
             z-index: 0;
-        }
-          
-        /* 移除所有白邊 */
+        }        /* 移除所有白邊 */
         body {
             margin: 0 !important;
             padding: 0 !important;
-            background: #1F1B17 !important;
+            background: #F0F5F0 !important;
         }
         
         /* 確保全屏背景 */
         #root, .gradio-app {
             margin: 0 !important;
             padding: 0 !important;
-            background: #1F1B17 !important;
+            background: #F0F5F0 !important;
         }
         
         /* 修正根元素 */
@@ -96,20 +153,33 @@ def build_main_app():
         /* 確保 gradio 元素透明 */
         .gr-panel, .gr-tab-nav {
             background: transparent !important;
-        }          /* 主內容區域 */
+        }        /* 主內容區域 */
         .main-content {
-            background: rgba(245, 240, 235, 0.92);
+            background: #F8FBF6;
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin: 0 auto;
-            width: 100%;
+            border: 2px solid rgba(106, 153, 78, 0.3);
+            margin: 20px;
+            width: calc(100% - 40px);
             box-sizing: border-box;
             position: relative;
             z-index: 1;
             overflow: hidden;
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(106, 153, 78, 0.05) 0%, transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 30%);
+            z-index: -1;
         }
           /* 英雄區域 */
         .hero-section {
@@ -143,10 +213,10 @@ def build_main_app():
         
         /* 圖片容器融入背景 */
         .hero-image {
-            position: relative !important;
-            margin: 0 auto 30px auto !important;
-            max-width: 500px !important;
-            background: transparent !important;
+            position: relative !重要;
+            margin: 0 auto 30px auto !重要;
+            max-width: 500px !重要;
+            background: transparent !重要;
         }
         
         .hero-image::before {
@@ -183,13 +253,13 @@ def build_main_app():
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 10px;
-            color: white !important;
+            color: white !重要;
         }
         
         .hero-visual-fallback p {
             font-size: 1.2rem;
             opacity: 0.9;
-            color: white !important;
+            color: white !重要;
         }
         
         .hero-visual-fallback .feature-icons {
@@ -222,7 +292,7 @@ def build_main_app():
             font-size: 0.9rem;
             font-weight: 500;
         }
-          /* 純CSS視覺化主圖 - 修正版本 */
+        
         .hero-visual-container {
             width: 100%;
             max-width: 500px;
@@ -373,13 +443,10 @@ def build_main_app():
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
-        }
-          /* 主標題 */
+        }        /* 主標題 */
         .main-title {
-            background: linear-gradient(135deg, #E86F38 0%, #F9A826 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 3rem;
+            color: #6A9A4E;
+            font-size: 4.8rem;
             font-weight: 700;
             margin-bottom: 30px;
             line-height: 1.2;
@@ -395,12 +462,11 @@ def build_main_app():
             left: 25%;
             width: 50%;
             height: 4px;
-            background: linear-gradient(135deg, #E86F38 0%, #F9A826 100%);
+            background: #D4AF37;
             border-radius: 2px;
-        }
-          /* 副標題 */
+        }/* 副標題 */
         .subtitle {
-            color: #614A35;
+            color: #2D5016 !important;
             font-size: 1.3rem;
             margin-bottom: 40px;
             margin-top: 10px;
@@ -416,46 +482,45 @@ def build_main_app():
         
         /* 章節標題 */
         .section-title {
-            text-align: center !important;
-            color: #1e293b !important;
-            font-size: 1.8rem !important;
-            font-weight: 600 !important;
-            margin: 50px 0 30px 0 !important;
+            text-align: center !重要;
+            color: #1e293b !重要;
+            font-size: 1.8rem !重要;
+            font-weight: 600 !重要;
+            margin: 50px 0 30px 0 !重要;
         }
         
         /* 功能卡片行 */
         .feature-cards-row {
-            margin: 40px 0 !important;
-            gap: 30px !important;
-        }
-          /* 功能卡片 */
+            margin: 40px 0 !重要;
+            gap: 30px !重要;
+        }        /* 功能卡片 */
         .feature-card {
-            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+            background: #FEFCF8;
             border-radius: 20px;
             padding: 40px 30px;
-            margin: 0 !important;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin: 0 !重要;
+            box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12);
+            border: 2px solid rgba(212, 175, 55, 0.2);
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
             position: relative;
             overflow: hidden;
             min-height: 320px;
-            display: flex !important;
-            flex-direction: column !important;
+            display: flex !重要;
+            flex-direction: column !重要;
         }
         
         .feature-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
-        }
-          .feature-card::before {
+            box-shadow: 0 24px 60px rgba(139, 69, 19, 0.2);
+            border-color: rgba(212, 175, 55, 0.4);
+        }        .feature-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 5px;
-            background: linear-gradient(90deg, #E86F38 0%, #F9A826 100%);
+            background: #6A9A4E;
         }
         
         /* 功能卡片內容 */
@@ -475,60 +540,146 @@ def build_main_app():
         
         .feature-title {
             color: #1e293b !important;
-            font-size: 1.4rem !important;
+            font-size: 1.6rem !important;
             font-weight: 600 !important;
             margin: 15px 0 !important;
         }
         
         .feature-description {
-            color: #64748b !important;
-            font-size: 1rem !important;
-            line-height: 1.6 !important;
-            margin-bottom: 25px !important;
+            color: #64748b !重要;
+            font-size: 1rem !重要;
+            line-height: 1.6 !重要;
+            margin-bottom: 25px !重要;
         }
         
         /* 功能按鈕 */
         .feature-button {
-            height: 50px !important;
-            font-size: 1rem !important;
-            font-weight: 600 !important;
-            border-radius: 12px !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-            margin-top: auto !important;
+            height: 50px !重要;
+            font-size: 1rem !重要;
+            font-weight: 600 !重要;
+            border-radius: 12px !重要;
+            transition: all 0.3s ease !重要;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !重要;
+            margin-top: auto !重要;
         }
         
         .feature-button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !important;
-        }
-          /* 按鈕顏色 - 低多邊形暖色調主題 */
+            transform: translateY(-2px) !重要;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2) !重要;
+        }        /* 按鈕顏色 - 中醫傳統配色 */
         .constitution-btn {
-            background: linear-gradient(135deg, #E86F38 0%, #F9A826 100%) !important;
+            background: #6A9A4E !important;
             color: white !important;
             border: none !important;
         }
         
         .secondary-btn {
-            background: linear-gradient(135deg, #D35400 0%, #E67E22 100%) !important;
+            background: #8B4513 !important;
             color: white !important;
             border: none !important;
         }
         
         .tertiary-btn {
-            background: linear-gradient(135deg, #873600 0%, #BA4A00 100%) !important;
+            background: #B22222 !important;
             color: white !important;
             border: none !important;
         }
         
-        /* 工作流程區域 */
+        /* 強化按鈕樣式 - 覆蓋所有可能的Gradio默認樣式 */
+        .gr-button.constitution-btn,
+        button.constitution-btn,
+        .constitution-btn button,
+        [class*="constitution-btn"] {
+            background-color: #6A9A4E !important;
+            background: #6A9A4E !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        .gr-button.secondary-btn,
+        button.secondary-btn,
+        .secondary-btn button,
+        [class*="secondary-btn"] {
+            background-color: #8B4513 !important;
+            background: #8B4513 !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        .gr-button.tertiary-btn,
+        button.tertiary-btn,
+        .tertiary-btn button,
+        [class*="tertiary-btn"] {
+            background-color: #B22222 !important;
+            background: #B22222 !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        /* 確保按鈕文字可見性 */
+        .feature-button,
+        .feature-button span,
+        .feature-button *,
+        .gr-button span,
+        .gr-button * {
+            color: white !important;
+            text-shadow: none !important;
+        }
+        
+        /* 覆蓋hover狀態 */
+        .constitution-btn:hover,
+        .gr-button.constitution-btn:hover {
+            background-color: #5A8A3E !important;
+            color: white !important;
+        }
+        
+        .secondary-btn:hover,
+        .gr-button.secondary-btn:hover {
+            background-color: #7A3F12 !important;
+            color: white !important;
+        }
+        
+        .tertiary-btn:hover,
+        .gr-button.tertiary-btn:hover {
+            background-color: #A01F1F !important;
+            color: white !important;
+        }
+        
+        /* 返回按鈕強化 */
+        .back-button,
+        .gr-button.back-button {
+            background-color: #6b7280 !important;
+            color: white !important;
+            border: none !important;
+        }
+        
+        .back-button:hover,
+        .gr-button.back-button:hover {
+            background-color: #5b6470 !important;
+            color: white !important;
+        }
+        
+        /* 確保所有按鈕都有正確的顏色 */
+        .gr-button {
+            color: white !important;
+        }
+        
+        /* 特別處理可能的文字顏色問題 */
+        button, .gr-button {
+            color: white !important;
+        }
+        
+        button span, .gr-button span {
+            color: white !important;
+        }
+          /* 工作流程區域 */
         .workflow-row {
-            margin: 30px 0 !important;
-            gap: 25px !important;
+            margin: 30px 0 !重要;
+            gap: 25px !重要;
         }
         
         .workflow-step {
-            background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+            background: #f8fafc;
             border-radius: 16px;
             padding: 30px 20px;
             text-align: center;
@@ -541,9 +692,8 @@ def build_main_app():
         .workflow-step:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        }
-          .step-number {
-            background: linear-gradient(135deg, #E86F38 0%, #F9A826 100%);
+        }        .step-number {
+            background: #6A9A4E;
             color: white;
             width: 50px;
             height: 50px;
@@ -557,17 +707,17 @@ def build_main_app():
         }
         
         .workflow-step h4 {
-            color: #1e293b !important;
-            font-size: 1.2rem !important;
-            font-weight: 600 !important;
-            margin: 15px 0 10px 0 !important;
+            color: #1e293b !重要;
+            font-size: 1.2rem !重要;
+            font-weight: 600 !重要;
+            margin: 15px 0 10px 0 !重要;
         }
         
         .workflow-step p {
-            color: #64748b !important;
-            font-size: 0.95rem !important;
-            line-height: 1.5 !important;
-            margin: 0 !important;
+            color: #64748b !重要;
+            font-size: 0.95rem !重要;
+            line-height: 1.5 !重要;
+            margin: 0 !重要;
         }
         
         /* 進度容器 */
@@ -579,124 +729,132 @@ def build_main_app():
         }
         
         .progress-item {
-            display: flex !important;
-            align-items: center !important;
+            display: flex !重要;
+            align-items: center !重要;
             background: rgba(255, 255, 255, 0.8);
             padding: 15px 25px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            font-size: 1.1rem !important;
+            font-size: 1.1rem !重要;
             min-width: 300px;
             justify-content: flex-start;
         }
         
         .progress-icon {
-            margin-right: 15px !important;
-            font-size: 1.2rem !important;
+            margin-right: 15px !重要;
+            font-size: 1.2rem !重要;
         }
         
         .progress-text {
-            font-weight: 500 !important;
-            color: #374151 !important;
+            font-weight: 500 !重要;
+            color: #374151 !重要;
         }
-        
-        /* 進度區域 */
+          /* 進度區域 */
         .progress-section {
-            background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+            background: #f8fafc;
             border-radius: 20px;
             padding: 40px;
             margin: 40px 0;
             border: 1px solid #e2e8f0;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-        }
-        
-        /* 使用說明區域 */
+        }        /* 使用說明區域 */
         .usage-section {
-            background: linear-gradient(145deg, #f0f9ff 0%, #dbeafe 100%);
+            background: #F0F7F0;
             border-radius: 20px;
             padding: 30px;
             margin: 25px 0;
-            border: 1px solid #dbeafe;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+            border: 2px solid rgba(106, 153, 78, 0.3);
+            box-shadow: 0 6px 24px rgba(106, 153, 78, 0.1);
         }
         
         .usage-section h3 {
-            color: #1e40af !important;
-            font-size: 1.3rem !important;
-            font-weight: 600 !important;
-            margin-bottom: 20px !important;
+            color: #4A6741 !重要;
+            font-size: 1.3rem !重要;
+            font-weight: 600 !重要;
+            margin-bottom: 20px !重要;
         }
         
         .usage-section ul {
-            text-align: left !important;
-            color: #1e40af !important;
+            text-align: left !重要;
+            color: #6A9A4E !重要;
         }
         
         .usage-section li {
-            margin: 8px 0 !important;
-            color: #1e40af !important;
-        }
-        
-        /* 免責聲明區域 */
+            margin: 8px 0 !重要;
+            color: #6A9A4E !重要;
+        }        /* 免責聲明區域 - 改為更溫和的顏色 */
         .disclaimer-section {
-            background: linear-gradient(145deg, #fef7f0 0%, #fed7aa 100%);
+            background: linear-gradient(135deg, #FFF8F5 0%, #F8F5F0 100%) !important;
             border-radius: 20px;
             padding: 30px;
             margin: 25px 0;
-            border: 1px solid #fed7aa;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+            border: 2px solid rgba(139, 69, 19, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .disclaimer-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(139, 69, 19, 0.05) 0%, transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.03) 0%, transparent 30%);
+            z-index: 0;
         }
         
         .disclaimer-section h3 {
-            color: #ea580c !important;
+            color: #8B4513 !important;
             font-size: 1.3rem !important;
             font-weight: 600 !important;
             margin-bottom: 20px !important;
+            position: relative;
+            z-index: 1;
         }
         
         .disclaimer-section ul {
             text-align: left !important;
-            color: #ea580c !important;
+            color: #5D2F0C !important;
+            position: relative;
+            z-index: 1;
         }
         
         .disclaimer-section li {
             margin: 8px 0 !important;
-            color: #ea580c !important;
+            color: #5D2F0C !important;
         }
-        
-        /* 返回按鈕 */
+          /* 返回按鈕 */
         .back-button {
-            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 10px !important;
-            padding: 12px 24px !important;
-            margin-bottom: 30px !important;
-            font-size: 1rem !important;
-            font-weight: 500 !important;
-            transition: all 0.3s ease !important;
+            background: #6b7280 !重要;
+            color: white !重要;
+            border: none !重要;
+            border-radius: 10px !重要;
+            padding: 12px 24px !重要;
+            margin-bottom: 30px !重要;
+            font-size: 1rem !重要;
+            font-weight: 500 !重要;
+            transition: all 0.3s ease !重要;
         }
         
         .back-button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-        }
-          /* 頁面標題 */
+            transform: translateY(-2px) !重要;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !重要;
+        }/* 頁面標題 */
         .page-title {
-            background: linear-gradient(135deg, #E86F38 0%, #F9A826 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.5rem;
+            color: #6A9A4E;
+            font-size: 2.8rem;
             font-weight: 700;
             margin-bottom: 40px;
             text-align: center;
         }
-          /* 響應式設計 */
-        @media (max-width: 1200px) {
+          /* 響應式設計 */        @media (max-width: 1200px) {
             .gradio-container {
-                max-width: 100% !important;
-                padding: 30px !important;
+                max-width: 100% !重要;
+                padding: 30px !重要;
             }
             .main-content {
                 padding: 30px;
@@ -705,7 +863,7 @@ def build_main_app():
                 min-height: 280px;
             }
             .main-title {
-                font-size: 2.5rem;
+                font-size: 3.5rem;
             }
             .hero-image, #main_vision {
                 max-width: 400px;
@@ -714,7 +872,7 @@ def build_main_app():
         
         @media (max-width: 768px) {
             .gradio-container {
-                padding: 20px !important;
+                padding: 20px !重要;
             }
             .main-content {
                 padding: 25px;
@@ -724,7 +882,7 @@ def build_main_app():
                 padding: 25px 20px;
             }
             .main-title {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
             .subtitle {
                 font-size: 1.1rem;
@@ -736,84 +894,316 @@ def build_main_app():
         
         /* 統一文字樣式 */
         h1, h2, h3 {
-            color: #1e293b !important;
+            color: #1e293b !重要;
         }
         
         /* 覆蓋 Gradio 默認樣式 */
         .gr-button {
-            font-weight: 600 !important;
+            font-weight: 600 !重要;
         }
         
         .gr-markdown h1,
         .gr-markdown h2,
         .gr-markdown h3 {
-            text-align: center !important;
+            text-align: center !重要;
         }
-          /* 確保卡片佈局 */
-        .feature-cards-row > .gr-column {
-            flex: 1 !important;
-            min-width: 0 !important;
+          /* 強化字體顏色可見性 - 全面覆蓋 */
+        .gr-markdown, .gr-markdown p, .gr-markdown h1, .gr-markdown h2, .gr-markdown h3 {
+            color: #1e293b !important;
         }
         
-        .workflow-row > .gr-column {
-            flex: 1 !important;
-            min-width: 0 !important;
-        }        /* 修正白邊問題 */
-        html {
-            background: #1F1B17 !important;
+        /* 確保所有文字都有明確的深色顏色 */
+        p, div, span, li, strong, em, b, i {
+            color: #1e293b !important;
+        }
+        
+        /* 特別處理可能的白色文字問題 */
+        .feature-title, .feature-description, .workflow-step h4, .workflow-step p {
+            color: #1e293b !important;
+        }
+        
+        /* 確保副標題顏色正確 */
+        .subtitle {
+            color: #2D5016 !important;
+        }
+        
+        /* 確保章節標題顏色正確 */
+        .section-title {
+            color: #1e293b !important;
+        }
+        
+        /* 強制所有 Markdown 內容為深色 */
+        .gr-markdown * {
+            color: #1e293b !important;
+        }
+        
+        /* 修正主標題顏色 */
+        .main-title {
+            color: #6A9A4E !important;
+        }
+        
+        /* 修正重要聲明區域文字顏色 */
+        .disclaimer-section * {
+            color: #5D2F0C !important;
+        }
+        
+        .disclaimer-section h3 {
+            color: #8B4513 !important;
+        }
+        
+        /* 修正使用說明區域文字顏色 */
+        .usage-section * {
+            color: #4A6741 !important;
+        }
+        
+        .usage-section h3 {
+            color: #4A6741 !important;
+        }
+        
+        /* 修正工作流程文字顏色 */
+        .workflow-step-compact * {
+            color: #1e293b !important;
+        }
+        
+        .workflow-step-compact h4 {
+            color: #1e293b !important;
+        }
+        
+        .workflow-step-compact p {
+            color: #64748b !important;
+        }
+        
+        /* 修正功能卡片文字顏色 */
+        .feature-card * {
+            color: #1e293b !important;
+        }
+        
+        .feature-title {
+            color: #1e293b !important;
+        }
+        
+        .feature-description {
+            color: #64748b !important;
+        }
+        
+        /* 覆蓋所有可能的白色文字 */
+        [style*="color: white"], [style*="color: #fff"], [style*="color: #ffffff"] {
+            color: #1e293b !important;
+        }        /* 主視覺圖片和工作流程並排區域 */
+        .main-visual-workflow-row {
+            margin: 40px 0 !important;
+            gap: 40px !important;
+            align-items: center !important;
+        }
+        
+        /* 左側視覺欄位 */
+        .visual-column {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+          /* 右側工作流程欄位 */
+        .workflow-column {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            position: relative !important;
+        }
+        
+        /* 工作流程標題 */
+        .workflow-title {
+            color: #1e293b !important;
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 25px !important;
+            text-align: center !important;
+            position: absolute !important;
+            top: -60px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 100% !important;
+        }
+          /* 工作流程步驟容器 - 整體長方形區域 */
+        .workflow-steps-container {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 30px 25px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 15px !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 350px !important;
+            justify-content: center !important;
+        }
+        
+        /* 緊湊型工作流程步驟 */
+        .workflow-step-compact {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .workflow-step-compact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .workflow-step-compact .step-number {
+            background: #6A9A4E;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
+        .workflow-step-compact .step-content {
+            flex: 1;
+        }
+        
+        .workflow-step-compact h4 {
+            color: #1e293b !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            margin: 0 0 4px 0 !important;
+        }
+        
+        .workflow-step-compact p {
+            color: #64748b !important;
+            font-size: 0.9rem !important;
+            line-height: 1.4 !important;
+            margin: 0 !important;
+        }
+          /* 有邊框的圖片樣式 - 無邊距 */
+        .bordered-image img {
+            border: 3px solid #6A9A4E !important;
+            border-radius: 15px !important;
+            box-shadow: 0 8px 30px rgba(106, 154, 78, 0.3) !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: white !important;
+        }
+        
+        .bordered-image {
             margin: 0 !important;
             padding: 0 !important;
+            display: block !important;
+        }
+
+        /* 強力修正所有文字顏色問題 */
+        
+        /* 修正 HTML 內容中的文字顏色 */
+        .hero-section * {
+            color: inherit !important;
         }
         
-        /* Gradio 特定元素的背景修正 */
-        .gradio-app, .gr-box {
-            background: transparent !important;
+        .hero-section h1 {
+            color: #6A9A4E !important;
         }
         
-        /* 確保所有容器背景透明 */
-        .gr-form, .gr-block {
-            background: transparent !important;
+        .hero-section p {
+            color: #2D5016 !important;
         }
         
-        /* 修正行距和對齊 */
-        .gr-row {
-            align-items: stretch !important;
+        /* 修正所有可能的白色文字 */
+        * {
+            color: inherit;
         }
         
-        /* 確保列等高和卡片對稱 */
-        .feature-cards-row > .gr-column,
-        .workflow-row > .gr-column {
-            display: flex !important;
-            flex-direction: column !important;
+        /* 確保所有元素都有深色文字 */
+        body, html {
+            color: #1e293b !important;
         }
         
-        /* 額外的背景修正 */
-        .gradio-container, .gradio-container > * {
-            background: transparent !important;
+        /* 修正 Gradio 組件中的白色文字 */
+        .gr-panel *, .gr-form *, .gr-box * {
+            color: #1e293b !important;
         }
         
-        /* 修正可能的邊距問題 */
-        .gr-column {
-            margin: 0 !important;
-        }
-          /* 確保按鈕容器等高 */
-        .feature-card > .gr-column,
-        .feature-card {
-            height: 100% !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
+        /* 修正所有標題 */
+        h1, h2, h3, h4, h5, h6 {
+            color: #1e293b !important;
         }
         
-        /* 功能卡片額外修正 */
-        .feature-card .gr-markdown {
-            flex-grow: 1 !important;
+        /* 除了主標題保持綠色 */
+        .main-title {
+            color: #6A9A4E !important;
         }
         
-        /* 確保卡片內按鈕底部對齊 */
-        .feature-card .gr-button {
-            margin-top: auto !important;
-        }"""
+        /* 修正所有段落和文字 */
+        p, span, div, li, ul, ol {
+            color: #1e293b !important;
+        }
+        
+        /* 特殊區域的文字顏色 */
+        .disclaimer-section p,
+        .disclaimer-section li,
+        .disclaimer-section span,
+        .disclaimer-section div {
+            color: #5D2F0C !important;
+        }
+        
+        .disclaimer-section h3,
+        .disclaimer-section h4 {
+            color: #8B4513 !important;
+        }
+        
+        /* 使用說明區域文字 */
+        .usage-section p,
+        .usage-section li,
+        .usage-section span,
+        .usage-section div {
+            color: #4A6741 !important;
+        }
+        
+        .usage-section h3,
+        .usage-section h4 {
+            color: #4A6741 !important;
+        }
+        
+        /* 工作流程區域文字 */
+        .workflow-step-compact div,
+        .workflow-step-compact span {
+            color: #1e293b !important;
+        }
+        
+        /* 功能卡片內的所有文字 */
+        .feature-card div,
+        .feature-card span,
+        .feature-card p,
+        .feature-card h3 {
+            color: #1e293b !important;
+        }
+        
+        /* 強制覆蓋所有可能的白色樣式 */
+        [style*="color:white"],
+        [style*="color: white"],
+        [style*="color:#fff"],
+        [style*="color: #fff"],
+        [style*="color:#ffffff"],
+        [style*="color: #ffffff"],
+        [style*="color:White"],
+        [style*="color: White"] {
+            color: #1e293b !important;
+        }
+        """
     ) as app:        # 全局狀態管理
         constitution_result_state = gr.State()
         food_result_state = gr.State()
@@ -830,10 +1220,9 @@ def build_main_app():
             # 三個主要功能按鈕
             with gr.Row(elem_classes=["feature-cards-row"]):
                 with gr.Column(scale=1, elem_classes=["feature-card"]):
-                    gr.Markdown("""
-                    <div class="feature-card-content">
+                    gr.Markdown("""                    <div class="feature-card-content">
                     <div class="feature-icon">🔍</div>
-                    <h3 class="feature-title">智能體質分析</h3>
+                    <h3 class="feature-title">智慧體質分析</h3>
                     <p class="feature-description">基於中醫理論的20題問卷調查，AI精準分析您的體質類型</p>
                     </div>
                     """)
@@ -874,82 +1263,59 @@ def build_main_app():
                         variant="secondary", 
                         size="lg",
                         elem_classes=["feature-button", "tertiary-btn"]
-                    )            # 主視覺圖片 - 移到按鈕下方
-            gr.Image(
-                value=hero_image_path,
-                show_label=False,
-                container=False,
-                elem_id="main_vision",
-                elem_classes=["hero-image"],
-                height=300,
-                width=500,
-                show_fullscreen_button=False,
-                show_download_button=False,
-                interactive=False
-            )
-            # 使用流程說明
-            gr.Markdown("## 使用流程", elem_classes=["section-title"])
-            
-            with gr.Row(elem_classes=["workflow-row"]):
-                with gr.Column(scale=1):
-                    gr.Markdown("""
-                    <div class="workflow-step">
-                    <div class="step-number">1</div>
-                    <h4>完成體質問卷</h4>
-                    <p>回答20個關於身體狀況的問題</p>
+                    )            # 主視覺圖片和使用流程並排區域
+            with gr.Row(elem_classes=["main-visual-workflow-row"]):
+                # 左側：主視覺圖片
+                with gr.Column(scale=2, elem_classes=["visual-column"]):
+                    gr.Image(
+                        value=hero_image_path,
+                        show_label=False,
+                        container=False,
+                        elem_id="main_vision",
+                        elem_classes=["hero-image", "bordered-image"],
+                        height=350,
+                        width=500,
+                        show_fullscreen_button=False,
+                        show_download_button=False,
+                        interactive=False
+                    )
+                  # 右側：使用流程說明
+                with gr.Column(scale=3, elem_classes=["workflow-column"]):
+                    gr.Markdown("### 使用流程", elem_classes=["workflow-title"])
+                    
+                    # 將三個步驟放在一個整體容器中
+                    gr.HTML("""
+                    <div class="workflow-steps-container">
+                        <div class="workflow-step-compact">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>完成體質問卷</h4>
+                                <p>回答20個關於身體狀況的問題</p>
+                            </div>
+                        </div>
+                        
+                        <div class="workflow-step-compact">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>上傳食物圖片</h4>
+                                <p>拍攝或選擇想要分析的食物</p>
+                            </div>
+                        </div>
+                        
+                        <div class="workflow-step-compact">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>獲得個人建議</h4>
+                                <p>查看量身定制的養生指導</p>
+                            </div>
+                        </div>
                     </div>
                     """)
-                
-                with gr.Column(scale=1):
-                    gr.Markdown("""
-                    <div class="workflow-step">
-                    <div class="step-number">2</div>
-                    <h4>上傳食物圖片</h4>
-                    <p>拍攝或選擇想要分析的食物</p>
-                    </div>
-                    """)
-                
-                with gr.Column(scale=1):
-                    gr.Markdown("""
-                    <div class="workflow-step">
-                    <div class="step-number">3</div>
-                    <h4>獲得個人建議</h4>
-                    <p>查看量身定制的養生指導</p>
-                    </div>
-                    """)            
-            # 進度追蹤
-            gr.Markdown("## 當前進度", elem_classes=["section-title"])
-            
-            progress_display = gr.Markdown("""
-            <div class="progress-container">
-            <div class="progress-item">
-                <span class="progress-icon">⭕</span>
-                <span class="progress-text">體質分析：未完成</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-icon">⭕</span>
-                <span class="progress-text">食物辨識：未完成</span>
-            </div>
-            <div class="progress-item">
-                <span class="progress-icon">⭕</span>
-                <span class="progress-text">養生建議：未完成</span>
-            </div>
-            </div>            """, elem_classes=["progress-section"])
-            
             # 注意事項
             with gr.Row():
                 with gr.Column(scale=1):
-                    gr.Markdown("""
-                    ### 使用提示
-                    - **建議順序**：體質分析 → 食物辨識 → 養生建議
-                    - **API配置**：體質分析需要設置 Groq API Key
-                    - **獨立使用**：所有功能都可以單獨使用
-                    - **最佳體驗**：完成所有步驟可獲得最準確的建議
-                    """, elem_classes=["usage-section"])
-                
-                with gr.Column(scale=1):
                     gr.Markdown("""                    ### 重要聲明
-                    - 本系統僅供**健康參考**使用
+                    - 本系統僾供**健康參考**使用
                     - **不能替代**專業醫療診斷
                     - 如有健康問題請**諮詢醫師**
                     - 建議結合**個人實際情況**調整
@@ -1080,18 +1446,17 @@ def build_main_app():
                 fn=show_home_page,
                 outputs=[home_page, constitution_page, food_page, advice_page, current_page]
             )
-        
-        # 更新進度顯示
+          # 更新進度顯示
         constitution_result_state.change(
             fn=update_progress,
             inputs=[constitution_result_state, food_result_state],
-            outputs=[progress_display]
+            outputs=[]
         )
         
         food_result_state.change(
             fn=update_progress,
             inputs=[constitution_result_state, food_result_state],
-            outputs=[progress_display]
+            outputs=[]
         )
     
     return app
