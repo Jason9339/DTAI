@@ -109,16 +109,6 @@ def build_constitution_analysis_page():
         gr.Markdown("## 🏥 中醫體質分析")
         gr.Markdown("請完成以下20題問卷，系統將使用AI分析您的中醫體質類型")
         
-        # API Key 設置
-        with gr.Row():
-            api_key_input = gr.Textbox(
-                label="🔑 Groq API Key",
-                placeholder="請輸入您的 Groq API Key（可選，如已設置環境變數則不需要）",
-                type="password",
-                scale=3
-            )
-            set_key_btn = gr.Button("設置", scale=1)
-        
         # 創建問題組件
         question_components = []
         
@@ -141,19 +131,6 @@ def build_constitution_analysis_page():
                     lines=2
                 )
             )
-        
-        def set_api_key(key):
-            if key.strip():
-                os.environ['GROQ_API_KEY'] = key.strip()
-                return "✅ API Key 已設置"
-            return "❌ 請輸入有效的 API Key"
-        
-        set_key_status = gr.Textbox(label="狀態", interactive=False)
-        set_key_btn.click(
-            fn=set_api_key,
-            inputs=[api_key_input],
-            outputs=[set_key_status]
-        )
         
         analyze_btn = gr.Button("🤖 AI 分析體質", variant="primary", size="lg")
         constitution_result_display = gr.JSON(label="AI 體質分析結果")

@@ -3,6 +3,7 @@ import gradio as gr
 from food_recognition import build_food_recognition_page
 from constitution_analysis import build_constitution_analysis_page
 from health_advice import build_health_advice_page
+import os
 
 def build_main_app():
     """建立主應用程式"""
@@ -65,8 +66,16 @@ def build_main_app():
             flex: 1 !important;
             min-width: 0 !important;
         }
+        .warning {
+            color: red;
+            font-weight: bold;
+            margin: 20px 0;
+        }
         """
     ) as app:
+        
+        # 檢查環境變數中是否設置了 API Key
+        groq_api_key = os.getenv('GROQ_API_KEY')
         
         # 全局狀態管理
         constitution_result_state = gr.State()
@@ -82,6 +91,14 @@ def build_main_app():
             
             ## 📋 使用流程
             """, elem_classes=["main-content"])
+            
+            # 如果沒有設置 API Key，顯示警告信息
+            if not groq_api_key:
+                gr.Markdown("""
+                <div class="warning">
+                ⚠️ 警告：未設置 GROQ_API_Key，系統可能無法正常運行。請在 .env 文件中設置 API Key。
+                </div>
+                """)
             
             with gr.Row(elem_classes=["step-row"]):
                 with gr.Column(elem_classes=["step-column"]):

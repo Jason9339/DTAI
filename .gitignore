@@ -1,0 +1,8 @@
+# 忽略 .env 文件，保護 API 金鑰
+.env
+
+# Python 相關
+__pycache__/
+
+# Gradio 相關
+.gradio/
