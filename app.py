@@ -11,13 +11,13 @@ STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(exist_ok=True)
 
 def create_hero_image():
-    """檢查是否有 main_vision.png 圖片"""
+    """提供預設的線上圖片或本地圖片"""
     img_path = STATIC_DIR / "main_vision.png"
     if img_path.exists():
         return str(img_path)
     
-    # 如果沒有找到圖片，返回 None（使用 CSS 視覺化）
-    return None
+    # 使用線上的中醫相關圖片作為預設
+    return "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=500&h=300&fit=crop&crop=center"
 
 def build_main_app():
     """建立主應用程式"""
@@ -817,64 +817,24 @@ def build_main_app():
     ) as app:        # 全局狀態管理
         constitution_result_state = gr.State()
         food_result_state = gr.State()
-        current_page = gr.State("home")          # 主頁面
+        current_page = gr.State("home")        # 主頁面
         with gr.Column(visible=True, elem_classes=["main-content"]) as home_page:
             # 主標題和介紹
             gr.HTML("""
             <div class="hero-section">
                 <h1 class="main-title">中醫食物寒熱辨識與體質分析系統</h1>
-            </div>
-            """)            # 主視覺圖片 - 融入背景設計
-            if hero_image_path:
-                hero_image = gr.Image(
-                    value=hero_image_path,
-                    show_label=False,
-                    container=False,
-                    elem_id="main_vision",
-                    elem_classes=["hero-image"]
-                )
-            else:
-                gr.HTML("""
-                <div class="hero-visual-container">
-                    <div class="hero-visual-html">
-                        <div class="main-circle">
-                            <span>中醫AI</span>
-                        </div>
-                        <div class="sub-circle-1">
-                            <span>體質</span>
-                        </div>
-                        <div class="sub-circle-2">
-                            <span>食物</span>
-                        </div>
-                        <div class="sub-circle-3">
-                            <span>養生</span>
-                        </div>
-                        <div class="connecting-lines">
-                            <div class="line line-1"></div>
-                            <div class="line line-2"></div>
-                            <div class="line line-3"></div>
-                        </div>
-                    </div>
-                </div>
-                """)
-            
-            # 副標題
-            gr.HTML("""
-            <div class="hero-section no-top-margin">
                 <p class="subtitle">結合現代AI技術與傳統中醫理論，依照您的個人體質，提供專屬的飲食養生建議</p>
             </div>
             """)
             
-            # 功能卡片區域
-            gr.Markdown("## 核心功能", elem_classes=["section-title"])
-            
+            # 三個主要功能按鈕
             with gr.Row(elem_classes=["feature-cards-row"]):
                 with gr.Column(scale=1, elem_classes=["feature-card"]):
                     gr.Markdown("""
                     <div class="feature-card-content">
-                    <div class="feature-icon">分析</div>
+                    <div class="feature-icon">🔍</div>
                     <h3 class="feature-title">智能體質分析</h3>
-                    <p class="feature-description">基於中醫理論的20題問卷調查，AI精準分析您的體質類型，了解體質特點和健康傾向</p>
+                    <p class="feature-description">基於中醫理論的20題問卷調查，AI精準分析您的體質類型</p>
                     </div>
                     """)
                     
@@ -888,9 +848,9 @@ def build_main_app():
                 with gr.Column(scale=1, elem_classes=["feature-card"]):
                     gr.Markdown("""
                     <div class="feature-card-content">
-                    <div class="feature-icon">識別</div>
+                    <div class="feature-icon">📸</div>
                     <h3 class="feature-title">食物寒熱辨識</h3>
-                    <p class="feature-description">上傳食物圖片，AI識別食材並分析其中醫屬性，了解食物的寒熱性質和適宜人群</p>
+                    <p class="feature-description">上傳食物圖片，AI識別食材並分析其中醫屬性</p>
                     </div>                    """)
                     
                     food_btn = gr.Button(
@@ -903,9 +863,9 @@ def build_main_app():
                 with gr.Column(scale=1, elem_classes=["feature-card"]):
                     gr.Markdown("""
                     <div class="feature-card-content">
-                    <div class="feature-icon">建議</div>
+                    <div class="feature-icon">💡</div>
                     <h3 class="feature-title">個人化建議</h3>
-                    <p class="feature-description">結合體質分析和食物屬性，為您量身定制飲食建議和生活調理方案</p>
+                    <p class="feature-description">結合體質分析和食物屬性，量身定制飲食建議</p>
                     </div>
                     """)
                     
@@ -914,7 +874,19 @@ def build_main_app():
                         variant="secondary", 
                         size="lg",
                         elem_classes=["feature-button", "tertiary-btn"]
-                    )            
+                    )            # 主視覺圖片 - 移到按鈕下方
+            gr.Image(
+                value=hero_image_path,
+                show_label=False,
+                container=False,
+                elem_id="main_vision",
+                elem_classes=["hero-image"],
+                height=300,
+                width=500,
+                show_fullscreen_button=False,
+                show_download_button=False,
+                interactive=False
+            )
             # 使用流程說明
             gr.Markdown("## 使用流程", elem_classes=["section-title"])
             
