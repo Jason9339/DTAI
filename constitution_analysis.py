@@ -156,52 +156,276 @@ def format_constitution_result(result: Dict) -> tuple:
     return image_path, display_text
 
 def build_constitution_analysis_page():
-    """建立體質分析頁面"""
-    with gr.Column():
-        gr.Markdown("## 🏥 中醫體質分析")
-        gr.Markdown("請完成以下20題問卷，系統將使用AI分析您的中醫體質類型")
+    """建立體質分析頁面"""    # 添加CSS樣式
+    gr.HTML("""
+    <style>        /* 問題標題樣式 - 針對動態生成的 Gradio 組件 */
+        .constitution-question label,
+        .constitution-textbox label,
+        .gr-checkbox-group > label,
+        .gr-textbox > label,
+        fieldset > legend,
+        .gr-group > label,
+        div[data-testid="checkbox-group"] > label[data-testid="checkbox-group-label"],
+        div[data-testid="textbox"] > label[data-testid="textbox-label"] {
+            color: #1e293b !important;
+            font-weight: 700 !important;
+            font-size: 3.5rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 20px !important;
+            display: block !important;
+            padding: 15px 0 !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1) !important;
+        }
         
+        /* 強制設定所有包含數字的問題標題 */
+        .constitution-question fieldset legend,
+        .constitution-textbox label {
+            font-size: 3.5rem !important;
+            font-weight: 700 !important;
+            color: #1e293b !important;
+            margin-bottom: 20px !important;
+        }
+        
+        /* CheckboxGroup 選項樣式 - 很小字體 */
+        .gr-checkbox-group .gr-checkbox label,
+        .gr-checkbox-group input[type="checkbox"] + label,
+        .gr-checkbox-group .checkbox-item label,
+        .gr-checkbox label:not([data-testid="checkbox-group-label"]),
+        .constitution-question .gr-checkbox label {
+            color: #374151 !important;
+            font-weight: 400 !important;
+            font-size: 0.65rem !important;
+            line-height: 1.2 !important;
+            margin: 1px 0 !important;
+            padding: 3px 5px !important;
+            border-radius: 4px !important;
+            transition: all 0.3s ease !important;
+            border: 1px solid #E5E7EB !important;
+            background: #FFFFFF !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            min-height: 22px !important;
+        }
+        
+        /* 選中狀態樣式 - 保持很小字體 */
+        .gr-checkbox-group input[type="checkbox"]:checked + label,
+        .constitution-question input[type="checkbox"]:checked + label {
+            background: linear-gradient(135deg, #8FBC8F 0%, #7BAB7B 100%) !important;
+            color: white !important;
+            font-weight: 500 !important;
+            border-color: #6A9A6A !important;
+            box-shadow: 0 2px 8px rgba(143, 188, 143, 0.3) !important;
+            font-size: 0.65rem !important;
+        }
+        
+        /* 問卷分組標題 */
+        .questionnaire-group-title {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 15px 20px;
+            margin: 25px 0 15px 0;
+            border-radius: 12px;
+            border-left: 4px solid #4A6741;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        /* 問題容器 */
+        .question-container {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* 進度指示器樣式 */
+        .progress-indicator {
+            background: linear-gradient(135deg, #e0f2e0 0%, #c8e6c8 100%);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #4A6741;
+            display: inline-block;
+        }
+        
+        .progress-indicator-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+        
+        .progress-indicator-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #4A6741;
+        }
+    </style>
+    """)
+    
+    # 問卷介紹區域
+    gr.HTML("""
+    <div class="questionnaire-section">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <h2 style="color: #4A6741; font-size: 1.5rem; font-weight: 600; margin-bottom: 15px;">
+                📋 中醫體質問卷調查
+            </h2>
+            <p style="color: #64748b; font-size: 1.1rem; line-height: 1.6;">
+                請仔細閱讀每個問題，根據您最近三個月的實際情況作答。<br>
+                問卷共20題，包含15道選擇題和5道簡答題。
+            </p>
+        </div>
+    </div>
+    """)
+    
+    with gr.Column():
         # 創建問題組件
         question_components = []
         
-        gr.Markdown("### 📋 選擇題（1-15題）")
+        # 選擇題區域
+        gr.HTML("""
+        <div class="questionnaire-group-title">
+            🔍 選擇題部分（第1-15題）
+        </div>
+        """)
+        
         for i, q in enumerate(CONSTITUTION_QUESTIONS[:15]):  # 前15題是選擇題
-            question_components.append(
-                gr.CheckboxGroup(
-                    choices=q["options"],
-                    label=f"{i+1}. {q['question']}",
-                    value=[]
+            with gr.Column(elem_classes=["question-container"]):
+                question_components.append(
+                    gr.CheckboxGroup(
+                        choices=q["options"],
+                        label=f"{i+1}. {q['question']}",
+                        value=[],
+                        elem_classes=["constitution-question"]
+                    )
                 )
-            )
         
-        gr.Markdown("### ✍️ 簡答題（16-20題）")
+        # 簡答題區域
+        gr.HTML("""
+        <div class="questionnaire-group-title">
+            ✍️ 簡答題部分（第16-20題）
+        </div>
+        """)
+        
         for i, q in enumerate(CONSTITUTION_QUESTIONS[15:], 15):  # 後5題是簡答題
-            question_components.append(
-                gr.Textbox(
-                    label=f"{i+1}. {q['question']}",
-                    placeholder=q["placeholder"],
-                    lines=2
-                )
-            )
+            with gr.Column(elem_classes=["question-container"]):
+                question_components.append(
+                    gr.Textbox(
+                        label=f"{i+1}. {q['question']}",
+                        placeholder=q["placeholder"],
+                        lines=3,
+                        elem_classes=["constitution-textbox"]
+                    )
+                )        # 分析按鈕區域
+        gr.HTML("""
+        <div style="text-align: center; margin: 40px 0 20px 0;">
+            <div class="progress-indicator">
+                <span class="progress-indicator-icon">🤖</span>
+                <span class="progress-indicator-text">完成問卷後，AI將在30秒內為您分析體質類型</span>
+            </div>
+        </div>        <script>
+            function applyConstitutionFontSizes() {
+                try {
+                    // 針對 CheckboxGroup 問題標題
+                    const checkboxGroups = document.querySelectorAll('.constitution-question');
+                    checkboxGroups.forEach(function(group) {
+                        const legend = group.querySelector('fieldset legend');
+                        const label = group.querySelector('label[data-testid="checkbox-group-label"]');                        if (legend && legend.textContent && legend.textContent.match(/^\\d+\\./)) {
+                            legend.style.fontSize = '3.5rem';
+                            legend.style.fontWeight = '700';
+                            legend.style.color = '#1e293b';
+                            legend.style.marginBottom = '20px';
+                            legend.style.lineHeight = '1.2';
+                        }
+                        
+                        if (label && label.textContent && label.textContent.match(/^\\d+\\./)) {
+                            label.style.fontSize = '3.5rem';
+                            label.style.fontWeight = '700';
+                            label.style.color = '#1e293b';
+                            label.style.marginBottom = '20px';
+                            label.style.lineHeight = '1.2';
+                        }
+                    });
+                    
+                    // 針對 Textbox 問題標題
+                    const textboxes = document.querySelectorAll('.constitution-textbox');
+                    textboxes.forEach(function(box) {
+                        const label = box.querySelector('label[data-testid="textbox-label"]');                        if (label && label.textContent && label.textContent.match(/^\\d+\\./)) {
+                            label.style.fontSize = '3.5rem';
+                            label.style.fontWeight = '700';
+                            label.style.color = '#1e293b';
+                            label.style.marginBottom = '20px';
+                            label.style.lineHeight = '1.2';
+                        }
+                    });
+                    
+                    // 設置選項為很小字體
+                    const optionLabels = document.querySelectorAll('.constitution-question .gr-checkbox label');
+                    optionLabels.forEach(function(label) {
+                        if (label.textContent && !label.textContent.match(/^\\d+\\./) && !label.hasAttribute('data-testid')) {
+                            label.style.fontSize = '0.65rem';
+                            label.style.fontWeight = '400';
+                            label.style.padding = '3px 5px';
+                            label.style.minHeight = '22px';
+                        }
+                    });
+                    
+                    // 通用選擇器強制設置問題標題                    const allLabels = document.querySelectorAll('label');
+                    allLabels.forEach(function(label) {
+                        if (label.textContent && label.textContent.match(/^\\d+\\./)) {
+                            label.style.fontSize = '3.5rem';
+                            label.style.fontWeight = '700';
+                            label.style.color = '#1e293b';
+                            label.style.marginBottom = '20px';
+                            label.style.lineHeight = '1.2';
+                        }
+                    });
+                    
+                } catch(e) {
+                    console.log('字體應用錯誤:', e);
+                }
+            }
+            
+            // 多次執行以確保樣式被應用
+            setTimeout(applyConstitutionFontSizes, 300);
+            setTimeout(applyConstitutionFontSizes, 1000);
+            setTimeout(applyConstitutionFontSizes, 2000);
+            setTimeout(applyConstitutionFontSizes, 4000);
+        </script>
+        """)
         
-        analyze_btn = gr.Button("🤖 AI 分析體質", variant="primary", size="lg")
+        analyze_btn = gr.Button(
+            "🚀 開始AI體質分析", 
+            variant="primary", 
+            size="lg",
+            elem_classes=["analyze-button"]
+        )
         
-        # 結果顯示區域 - 使用Row布局
-        with gr.Row(visible=False) as result_row:
-            with gr.Column(scale=2):
-                constitution_image = gr.Image(
-                    label="體質圖像", 
-                    height=400,
-                    width=400,
-                    show_download_button=False,
-                    container=False
-                )
-            with gr.Column(scale=3):
-                constitution_text = gr.Markdown(
-                    label="分析結果",
-                    value="",
-                    container=False
-                )
+        # 結果顯示區域
+        with gr.Column(visible=False, elem_classes=["constitution-result-section"]) as result_row:
+            gr.HTML("""
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="color: #4A6741; font-size: 1.8rem; font-weight: 600;">
+                    🎯 您的體質分析結果
+                </h2>
+            </div>
+            """)
+            
+            with gr.Row():
+                with gr.Column(scale=2):
+                    constitution_image = gr.Image(
+                        label="體質特徵圖", 
+                        height=400,
+                        width=400,
+                        show_download_button=False,
+                        container=True,
+                        elem_classes=["constitution-image"]
+                    )
+                with gr.Column(scale=3):
+                    constitution_text = gr.Markdown(
+                        value="",
+                        container=True,
+                        elem_classes=["constitution-result-text"]
+                    )
         
         # 原始JSON結果（隱藏，僅供調試）
         constitution_result_display = gr.JSON(label="詳細分析數據", visible=False)
@@ -258,4 +482,4 @@ def build_constitution_analysis_page():
             outputs=[constitution_image, constitution_text, result_row, constitution_result_display]
         )
         
-        return constitution_result_display, constitution_state 
+        return constitution_result_display, constitution_state
