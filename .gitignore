@@ -1,8 +1,34 @@
-# 忽略 .env 文件，保護 API 金鑰
+# 環境變數
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+config.local.py
 
 # Python 相關
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
 # Gradio 相關
 .gradio/
@@ -10,3 +36,14 @@ __pycache__/
 env
 ui-design-creation.mdc
 __pycache__
+
+# 虛擬環境
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.conda/
+
+# Gradio 相关
