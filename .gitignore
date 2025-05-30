@@ -30,6 +30,13 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Gradio 相關
+.gradio/
+
+env
+ui-design-creation.mdc
+__pycache__
+
 # 虛擬環境
 venv/
 env/
@@ -40,23 +47,3 @@ venv.bak/
 .conda/
 
 # Gradio 相关
-.gradio/
-gradio_temp/
-
-# IDE 和編輯器
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# 系统文件
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
