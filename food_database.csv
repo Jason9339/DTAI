@@ -1,31 +1,193 @@
 English,Chinese,FiveNature
-apple,蘋果,平性
-banana,香蕉,寒性
-orange,橘子,溫性
-watermelon,西瓜,寒性
-longan,龍眼,溫性
-pear,梨子,涼性
-peach,桃子,溫性
-grape,葡萄,平性
-white_radish,白蘿蔔,涼性
-carrot,胡蘿蔔,平性
-tomato,番茄,涼性
-cucumber,黃瓜,涼性
-eggplant,茄子,涼性
-spinach,菠菜,涼性
-leek,韭菜,溫性
-cabbage,白菜,平性
-ginger,生薑,溫性
-garlic,大蒜,溫性
-onion,洋蔥,溫性
-green_bean,綠豆,寒性
-red_bean,紅豆,平性
-rice,白米,平性
-wheat,小麥,涼性
-corn,玉米,平性
-sweet_potato,地瓜,平性
-potato,馬鈴薯,平性
-broccoli,花椰菜,平性
-lettuce,萵苣,涼性
-celery,芹菜,涼性
-mushroom,香菇,平性 
+Heading mustard,包心芥菜,溫
+Chinese chives,韭菜,溫
+Chinese chive flowers,韭菜花,溫
+Perilla,紫蘇,溫
+Salted potherb mustard,雪裡紅,溫
+Kale,甘藍,平
+Chinese kale,芥藍,平
+Cabbage,高麗菜,平
+Bok choy,青江菜,平
+Pepper,椒,平
+Greenbellpepper,青椒,平
+Lettuce,萵苣,平
+Radish sprouts,蘿蔔嬰,平
+A-choy,A菜,涼
+Wheatgrass,小麥草,涼
+Kohlrabi,大頭菜,涼
+Gynura divaricata,白鳳菜,涼
+Goji leaves,枸杞葉,涼
+Celery,芹菜,涼
+Yau choy,油菜,涼
+Okra,秋葵,涼
+Okinawa spinach,紅鳳菜,涼
+Red amaranth,紅莧菜,涼
+Spinach,菠菜,涼
+Pickled mustard greens,酸菜,涼
+Sweet potato leaves,番薯葉,涼
+Napa cabbage,大白菜,寒
+Water spinach,空心菜,寒
+Celery,西洋芹,寒
+Oyster mushroom,袖珍菇,溫
+Abalone mushroom,鮑魚菇,溫
+Wood ear mushroom,木耳,平
+Snow fungus,白木耳,平
+King oyster mushroom,杏鮑菇,平
+Shiitake mushroom,香菇,平
+Shaggy mane mushroom,雞腿菇,平
+Maitake mushroom,舞茸,平
+Enoki mushroom,金針菇,寒
+Straw mushroom,草菇,寒
+Soybean sprouts,黃豆芽,寒
+Alfalfa sprouts,苜蓿芽,平
+Pumpkin,南瓜,平
+Baby corn,玉米筍,平
+Cucumber,黃瓜,涼
+Winter melon,冬瓜,涼
+Cucumber,胡瓜,涼
+Luffa,絲瓜,涼
+Eggplant,茄子,涼
+Cucumber,小黃瓜,涼
+Kelp,海帶,涼
+Black moss,髮菜,涼
+Bitter melon,苦瓜,寒
+Nori,紫菜,寒
+Jujube,棗子,溫
+Peach,桃子,溫
+Chinese bayberry,楊梅,溫
+Papaya,木瓜,平
+Plum,梅子,平
+Guava,芭樂,平
+Tomato,番茄,寒
+Strawberry,草莓,涼
+Durian,榴槤,熱
+Peach,水蜜桃,溫
+Red date,紅棗,溫
+Lychee,荔枝,溫
+Longan,龍眼,溫
+Cherry,櫻桃,溫
+Plum,李子,平
+Pineapple,鳳梨,平
+Grape,葡萄,平
+Blueberry,藍莓,平
+Mango,芒果,平
+Avocado,酪梨,平
+Pear,梨子,涼
+Mangosteen,山竹,寒
+Watermelon,西瓜,寒
+Minong melon,美濃瓜,寒
+Passion fruit,百香果,寒
+Banana,香蕉,寒
+Coconut,椰子,寒
+Pomegranate,石榴,溫
+Rambutan,紅毛丹,溫
+Ya pear,鴨梨,溫
+Dragon fruit,火龍果,平
+Fig,無花果,平
+Raspberry,覆盆子,平
+Dried persimmon,柿餅,平
+Star fruit,楊桃,平
+Olive,橄欖,平
+Sugar apple,釋迦,平
+Orange,柳丁,涼
+Mandarin,橘子,涼
+Pomelo,文旦,寒
+Pomelo,柚子,寒
+Persimmon,柿子,寒
+Kumquat,金桔,溫
+Kumquat,金棗,溫
+Lime,萊姆,平
+Apple,蘋果,平
+Wax apple,蓮霧,平
+Kiwifruit,奇異果,寒
+Pear,西洋梨,寒
+Grapefruit,葡萄柚,寒
+Pine nut,松子,溫
+Chestnut,栗子,溫
+Oat,燕麥,溫
+Glutinous rice,糯米,溫
+Cowpea,米豆,平
+Green bean,菜豆,平
+Peanut,花生,平
+Kidney bean,花豆,平
+Pea,豌豆,平
+Adzuki bean,紅豆,平
+Black soybean,黑豆,平
+Soybean,黃豆,平
+Natto,納豆,平
+Jicama,豆薯,平
+Almond,杏仁,平
+Corn,玉米,平
+Pumpkin seed,南瓜子,平
+Sunflower seed,葵瓜子,平
+Green bean,四季豆,平
+Lima bean,皇帝豆,平
+Lotus seed,蓮子,平
+Cashew nut,腰果,平
+Sesame seed,芝麻,平
+Tofu,豆腐,涼
+Water caltrop,菱角,涼
+Buckwheat,蕎麥,平
+Wheat flour,麵粉,平
+Mung bean,綠豆,寒
+Millet,小米,寒
+Carrot,紅蘿蔔,平
+Potato,馬鈴薯,平
+Sweet potato,番薯,平
+Taro,芋頭,平
+Daikon,白蘿蔔,涼
+Lotus root,蓮藕,涼
+Bamboo shoot,竹筍,寒
+Water bamboo,筊白筍,寒
+Asparagus,蘆筍,寒
+Pork tripe,豬肚,溫
+Beef tripe,牛肚,平
+Duck blood,鴨血,寒
+Milk,牛奶,平
+Quail egg,鵪鶉蛋,平
+Century egg,皮蛋,涼
+Sea cucumber,海參,溫
+Shrimp,蝦子,溫
+Dried shrimp,蝦米,溫
+Lobster,龍蝦,溫
+Dried scallop,干貝,平
+Sea urchin,海膽,平
+Abalone,鮑魚,平
+Octopus,章魚,寒
+Crab,螃蟹,寒
+Freshwater clam,蜆,寒
+Chili pepper,辣椒,熱
+Wasabi,山葵,熱
+White pepper,白胡椒,熱
+Black pepper,黑胡椒,熱
+Onion,洋蔥,熱
+Cinnamon,肉桂,熱
+Star anise,八角,熱
+Brown sugar,紅砂糖,溫
+Ginger,薑,溫
+Green onion,蔥,溫
+Garlic,蒜,溫
+Safflower,紅花,溫
+Cardamom,小荳蔻,溫
+Nutmeg,荳蔻,溫
+Cilantro,芫荽,溫
+Honey,蜂蜜,平
+Cream,奶油,平
+Cheese,乳酪,平
+Soy sauce,醬油,寒
+Clove,丁香,溫
+Thyme,百里香,溫
+Fennel,茴香菜,溫
+Parsley,巴西利,溫
+Rosemary,迷迭香,溫
+Fish mint,魚腥草,涼
+Mint,薄荷,涼
+Cocoa,可可,平
+Birdsnest,燕窩,平
+Birds-nestfern,山蘇,溫
+Beetroot,甜菜根,平
+Cauliflower,花椰菜,平
+GreenSoybean,毛豆,平
+Jobstears,薏苡仁,涼
+Madeira_vine,川七,溫
+Rice,白飯,平
