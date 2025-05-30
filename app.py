@@ -868,13 +868,408 @@ def build_main_app():
         .back-button:hover {
             transform: translateY(-2px) !重要;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !重要;
-        }/* 頁面標題 */
+        }        /* 頁面標題 */
         .page-title {
-            color: #6A9A4E;
-            font-size: 2.8rem;
-            font-weight: 700;
-            margin-bottom: 40px;
-            text-align: center;
+            color: #6A9A4E !important;
+            font-size: 2.8rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 20px !important;
+            text-align: center !important;
+            line-height: 1.2 !important;
+            position: relative !important;
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 25%;
+            width: 50%;
+            height: 4px;
+            background: #D4AF37;
+            border-radius: 2px;
+        }
+        
+        .page-subtitle {
+            color: #2D5016 !important;
+            font-size: 1.2rem !important;
+            text-align: center !important;
+            margin-bottom: 40px !important;
+            line-height: 1.6 !important;
+            font-weight: 400 !important;
+        }
+        
+        .constitution-hero-section {
+            text-align: center !important;
+            margin-bottom: 40px !important;
+            padding: 20px 0 !important;
+        }
+        
+        /* 問卷區域樣式 */
+        .questionnaire-section {
+            background: #F8FBF6 !important;
+            border-radius: 20px !important;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+            border: 2px solid rgba(106, 153, 78, 0.2) !important;
+            box-shadow: 0 8px 32px rgba(106, 153, 78, 0.1) !important;
+            position: relative !important;
+        }
+        
+        .questionnaire-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(106, 153, 78, 0.03) 0%, transparent 30%),
+                radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.02) 0%, transparent 30%);
+            border-radius: 20px;
+            z-index: 0;
+        }
+        
+        .questionnaire-section > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 問卷組標題 */
+        .questionnaire-group-title {
+            color: #4A6741 !important;
+            font-size: 1.4rem !important;
+            font-weight: 600 !important;
+            margin: 30px 0 20px 0 !important;
+            padding: 15px 20px !important;
+            background: linear-gradient(135deg, #E8F5E8 0%, #F0F8F0 100%) !important;
+            border-radius: 12px !important;
+            border-left: 5px solid #6A9A4E !important;
+            text-align: left !important;
+        }        /* 問題容器 */
+        .question-container {
+            background: #FFFFFF !important;
+            border-radius: 15px !important;
+            padding: 15px !important;
+            margin: 5px 0 !important;
+            border: 1px solid rgba(106, 153, 78, 0.15) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .question-container:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(106, 153, 78, 0.1) !important;
+            border-color: rgba(106, 153, 78, 0.25) !important;
+        }        /* 問題標籤 */
+        .gr-form label,
+        .question-container label,
+        fieldset legend {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            font-size: 1.3rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 15px !important;
+        }
+          /* 強化問題標題字體大小 - 針對 CheckboxGroup 和 Textbox 的標籤 */
+        .gr-checkbox-group > label,
+        .gr-textbox > label,
+        .constitution-question > label,
+        .constitution-textbox > label,
+        fieldset > legend {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            font-size: 1.3rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 15px !important;
+        }
+        
+        /* 更強力的問題標題選擇器 - 覆蓋所有可能的Gradio結構 */
+        .gr-block > label,
+        .gr-form-group > label,
+        .gradio-checkbox > label,
+        .gradio-textbox > label,
+        [data-testid*="checkbox"] > label,
+        [data-testid*="textbox"] > label,
+        .gr-panel label:first-child,
+        .question-container > * > label {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            font-size: 1.3rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 15px !important;
+        }
+          /* 最強力的覆蓋 - 針對所有可能的問題標籤 */
+        .question-container label:not(.gr-checkbox-group label):not(.checkbox-group label) {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            font-size: 1.3rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 15px !important;
+        }        /* 專門針對 CheckboxGroup 和 Textbox 的問題標題 */
+        .gr-checkbox-group fieldset legend,
+        .gr-textbox label,
+        .constitution-question fieldset legend,
+        .constitution-textbox label {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            font-size: 2.0rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 15px !important;
+            display: block !important;
+        }
+        
+        /* 強制覆蓋所有 fieldset legend 樣式 */
+        fieldset legend {
+            color: #1e293b !important;
+            font-weight: 600 !important;
+            font-size: 2.0rem !important;
+            line-height: 1.5 !important;
+            margin-bottom: 15px !important;
+            padding: 0 !important;
+        }/* CheckboxGroup 樣式 - 強化版本 */
+        .gr-checkbox-group fieldset {
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        
+        .gr-checkbox-group .wrap {
+            gap: 8px !important;
+        }        /* 更強力的 Checkbox 選項樣式 */
+        .gr-checkbox-group label,
+        .checkbox-group label,
+        [data-testid*="checkbox"] label {
+            color: #374151 !important;
+            font-weight: 400 !important;
+            font-size: 0.8rem !important;
+            line-height: 1.4 !important;
+            margin: 4px 0 !important;
+            padding: 12px 16px !important;
+            border-radius: 10px !important;
+            transition: all 0.3s ease !important;
+            border: 2px solid #E5E7EB !important;
+            background: #FFFFFF !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            min-height: 48px !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* 懸停效果 */
+        .gr-checkbox-group label:hover,
+        .checkbox-group label:hover,
+        [data-testid*="checkbox"] label:hover {
+            background: #F0F8F0 !important;
+            border-color: rgba(106, 153, 78, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+          /* Checkbox 輸入框樣式 */
+        .gr-checkbox-group input[type="checkbox"],
+        .checkbox-group input[type="checkbox"],
+        [data-testid*="checkbox"] input[type="checkbox"] {
+            width: 20px !important;
+            height: 20px !important;
+            margin-right: 12px !important;
+            accent-color: #6A9A4E !important;
+            cursor: pointer !important;
+            flex-shrink: 0 !important;
+            appearance: checkbox !important;
+            -webkit-appearance: checkbox !important;
+            -moz-appearance: checkbox !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: inline-block !important;
+            position: relative !important;
+            border: 2px solid #D1D5DB !important;
+            border-radius: 4px !important;
+            background-color: #FFFFFF !important;
+        }
+        
+        /* 選中狀態 - 多重選擇器確保覆蓋 */
+        .gr-checkbox-group input[type="checkbox"]:checked,
+        .checkbox-group input[type="checkbox"]:checked,
+        [data-testid*="checkbox"] input[type="checkbox"]:checked {
+            background-color: #6A9A4E !important;
+            border-color: #6A9A4E !important;
+            accent-color: #6A9A4E !important;
+        }
+        
+        /* 確保 checkbox 在懸停時也可見 */
+        .gr-checkbox-group input[type="checkbox"]:hover,
+        .checkbox-group input[type="checkbox"]:hover,
+        [data-testid*="checkbox"] input[type="checkbox"]:hover {
+            border-color: #6A9A4E !important;
+        }
+          /* 選中時的標籤樣式 - 使用多種方式確保生效 */
+        .gr-checkbox-group label:has(input[type="checkbox"]:checked),
+        .checkbox-group label:has(input[type="checkbox"]:checked),
+        [data-testid*="checkbox"] label:has(input[type="checkbox"]:checked),
+        .gr-checkbox-group label.selected,
+        .checkbox-group label.selected,
+        .gr-checkbox-group label.checkbox-selected,
+        .checkbox-group label.checkbox-selected,
+        [data-testid*="checkbox"] label.selected {
+            background: linear-gradient(135deg, #8FBC8F 0%, #7BAB7B 100%) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-color: #6A9A6A !important;
+            box-shadow: 0 4px 12px rgba(143, 188, 143, 0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* 強制覆蓋所有可能的 Gradio 默認樣式 */
+        .gr-checkbox-group label * {
+            color: inherit !important;
+        }
+        
+        .gr-checkbox-group label.selected *,
+        .gr-checkbox-group label.checkbox-selected * {
+            color: white !important;
+        }
+          /* 額外的備用樣式 - 使用屬性選擇器 */
+        label[data-checked="true"] {
+            background: linear-gradient(135deg, #8FBC8F 0%, #7BAB7B 100%) !important;
+            color: white !important;
+            font-weight: 600 !important;
+            border-color: #6A9A6A !important;
+            box-shadow: 0 4px 12px rgba(143, 188, 143, 0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        /* 文字輸入框 */
+        .gr-textbox,
+        .gr-textbox textarea,
+        .gr-textbox input {
+            border: 2px solid rgba(106, 153, 78, 0.2) !important;
+            border-radius: 10px !important;
+            padding: 12px 16px !important;
+            font-size: 1rem !important;
+            color: #1e293b !important;
+            background: #FFFFFF !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .gr-textbox:focus,
+        .gr-textbox textarea:focus,
+        .gr-textbox input:focus {
+            border-color: #6A9A4E !important;
+            box-shadow: 0 0 0 3px rgba(106, 153, 78, 0.1) !important;
+        }
+        
+        .gr-textbox::placeholder,
+        .gr-textbox textarea::placeholder,
+        .gr-textbox input::placeholder {
+            color: #9CA3AF !important;
+        }
+          /* 分析按鈕 */
+        .analyze-button {
+            background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 15px !important;
+            padding: 15px 40px !important;
+            font-size: 1.2rem !important;
+            font-weight: 600 !important;
+            margin: 30px auto !important;
+            display: block !important;
+            box-shadow: 0 8px 25px rgba(45, 55, 72, 0.3) !important;
+            transition: all 0.3s ease !important;
+            text-transform: none !important;
+            min-width: 200px !important;
+        }
+        
+        .analyze-button:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 12px 35px rgba(45, 55, 72, 0.4) !important;
+            background: linear-gradient(135deg, #1A202C 0%, #0F1419 100%) !important;
+        }
+        
+        /* 結果顯示區域 */
+        .constitution-result-section {
+            background: linear-gradient(135deg, #F8FBF6 0%, #FEFEFE 100%) !important;
+            border-radius: 20px !important;
+            padding: 40px !important;
+            margin: 30px 0 !important;
+            border: 2px solid rgba(106, 153, 78, 0.2) !important;
+            box-shadow: 0 15px 40px rgba(106, 153, 78, 0.15) !important;
+            position: relative !important;
+        }
+        
+        .constitution-result-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(106, 153, 78, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.03) 0%, transparent 40%);
+            border-radius: 20px;
+            z-index: 0;
+        }
+        
+        .constitution-result-section > * {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 體質圖片 */
+        .constitution-image {
+            border-radius: 15px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+            border: 3px solid #6A9A4E !important;
+            background: white !important;
+        }
+        
+        /* 體質結果文字 */
+        .constitution-result-text {
+            background: #FFFFFF !important;
+            border-radius: 15px !important;
+            padding: 25px !important;
+            border: 1px solid rgba(106, 153, 78, 0.2) !important;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08) !important;
+        }
+        
+        .constitution-result-text h1,
+        .constitution-result-text h2,
+        .constitution-result-text h3 {
+            color: #4A6741 !important;
+            margin-top: 20px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .constitution-result-text p {
+            color: #1e293b !important;
+            line-height: 1.6 !important;
+            margin-bottom: 15px !important;
+        }
+        
+        .constitution-result-text strong {
+            color: #6A9A4E !important;
+        }
+        
+        /* 進度指示器 */
+        .progress-indicator {
+            background: #E8F5E8 !important;
+            border-radius: 12px !important;
+            padding: 15px 20px !important;
+            margin: 20px 0 !important;
+            border-left: 5px solid #6A9A4E !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 15px !important;
+        }
+        
+        .progress-indicator-icon {
+            font-size: 1.5rem !important;
+        }
+        
+        .progress-indicator-text {
+            color: #4A6741 !important;
+            font-weight: 500 !important;
         }
           /* 響應式設計 */        @media (max-width: 1200px) {
             .gradio-container {
@@ -1130,9 +1525,7 @@ def build_main_app():
             margin: 0 !important;
             padding: 0 !important;
             display: block !important;
-        }
-
-        /* 強力修正所有文字顏色問題 */
+        }        /* 強力修正所有文字顏色問題 */
         
         /* 修正 HTML 內容中的文字顏色 */
         .hero-section * {
@@ -1228,6 +1621,187 @@ def build_main_app():
         [style*="color: White"] {
             color: #1e293b !important;
         }
+        </style>
+          <script>
+        // 強化版 JavaScript 來處理 CheckboxGroup 的選中狀態視覺效果
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('CheckboxGroup 樣式腳本已載入');
+            
+            // 更強力的選中狀態處理函數
+            function handleCheckboxChange() {
+                // 尋找所有可能的 checkbox 選擇器
+                const selectors = [
+                    '.gr-checkbox-group input[type="checkbox"]',
+                    '[data-testid*="checkbox"] input',
+                    '.checkbox-group input[type="checkbox"]',
+                    'input[type="checkbox"]'
+                ];
+                
+                let checkboxes = [];
+                for (let selector of selectors) {
+                    const found = document.querySelectorAll(selector);
+                    if (found.length > 0) {
+                        checkboxes = found;
+                        console.log(`找到 ${found.length} 個 checkbox，使用選擇器: ${selector}`);
+                        break;
+                    }
+                }
+                
+                checkboxes.forEach((checkbox, index) => {
+                    // 尋找對應的標籤元素
+                    let label = checkbox.closest('label') || 
+                               checkbox.parentElement.querySelector('label') ||
+                               checkbox.nextElementSibling ||
+                               checkbox.parentElement;
+                      if (label) {                        // 強制設置選項字體為小字體
+                        label.style.fontSize = '0.8rem';
+                        
+                        if (checkbox.checked) {
+                            // 添加選中樣式
+                            label.classList.add('selected', 'checkbox-selected');
+                            console.log(`Checkbox ${index} 已選中`);
+                              // 直接設置內聯樣式作為備用
+                            label.style.background = 'linear-gradient(135deg, #8FBC8F 0%, #7BAB7B 100%)';
+                            label.style.color = 'white';                            label.style.fontWeight = '600';
+                            label.style.borderColor = '#6A9A6A';
+                            label.style.boxShadow = '0 4px 12px rgba(143, 188, 143, 0.3)';
+                            label.style.fontSize = '0.8rem'; // 確保選中時也是小字體
+                        } else {
+                            // 恢復未選中樣式
+                            label.style.background = '#FFFFFF';
+                            label.style.color = '#374151';
+                            label.style.fontWeight = '400';
+                            label.style.borderColor = '#E5E7EB';
+                            label.style.boxShadow = '';
+                            label.style.fontSize = '0.8rem'; // 確保未選中時也是小字體
+                        }
+                    }
+                    
+                    // 特別處理問題標題的字體大小
+                    const questionLabels = label.closest('.question-container')?.querySelectorAll('label:not(.gr-checkbox-group label)');
+                    if (questionLabels) {
+                        questionLabels.forEach(qLabel => {
+                            if (!qLabel.closest('.gr-checkbox-group')) {
+                                qLabel.style.fontSize = '1.3rem';
+                                qLabel.style.fontWeight = '600';
+                                qLabel.style.color = '#1e293b';
+                            }
+                        });
+                    }
+                    }
+                });
+            }
+            
+            // 添加懸停效果
+            function addHoverEffects() {
+                const checkboxContainers = document.querySelectorAll('.gr-checkbox-group label, .checkbox-group label');
+                checkboxContainers.forEach(label => {
+                    if (!label.hasAttribute('data-hover-added')) {
+                        label.setAttribute('data-hover-added', 'true');
+                        
+                        label.addEventListener('mouseenter', function() {
+                            if (!this.classList.contains('selected')) {
+                                this.style.background = '#F0F8F0';
+                                this.style.borderColor = 'rgba(106, 153, 78, 0.3)';
+                                this.style.transform = 'translateY(-1px)';
+                            }
+                        });
+                        
+                        label.addEventListener('mouseleave', function() {
+                            if (!this.classList.contains('selected')) {
+                                this.style.background = '#FFFFFF';
+                                this.style.borderColor = '#E5E7EB';
+                                this.style.transform = '';
+                            }
+                        });
+                    }
+                });
+            }            // 添加問題標題字體處理
+            function enhanceQuestionTitles() {
+                // 專門尋找問題標題 - fieldset legend 和主要 label
+                const fieldsetLegends = document.querySelectorAll('fieldset legend');                fieldsetLegends.forEach(legend => {
+                    legend.style.fontSize = '2.0rem';
+                    legend.style.fontWeight = '600';
+                    legend.style.color = '#1e293b';
+                    legend.style.lineHeight = '1.5';
+                    legend.style.marginBottom = '15px';
+                    legend.style.padding = '0';
+                    console.log('設置問題標題字體:', legend.textContent?.substring(0, 30));
+                });
+                
+                // 尋找 Textbox 的 label
+                const textboxLabels = document.querySelectorAll('.gr-textbox > label:first-child');
+                textboxLabels.forEach(label => {
+                    if (label.textContent && label.textContent.includes('.')) {
+                        label.style.fontSize = '2.0rem';
+                        label.style.fontWeight = '600';
+                        label.style.color = '#1e293b';
+                        label.style.lineHeight = '1.5';
+                        label.style.marginBottom = '15px';
+                        console.log('設置Textbox問題標題字體:', label.textContent?.substring(0, 30));
+                    }
+                });
+            }
+            
+            // 初始化檢查（延遲執行確保 DOM 完全載入）            setTimeout(() => {
+                handleCheckboxChange();
+                addHoverEffects();
+                enhanceQuestionTitles();
+                console.log('初始化 checkbox 樣式完成');
+            }, 1500);
+            
+            // 監聽所有可能的變化事件
+            ['change', 'click', 'input'].forEach(eventType => {
+                document.addEventListener(eventType, function(e) {
+                    if (e.target.type === 'checkbox') {
+                        console.log(`Checkbox ${eventType} 事件觸發`);
+                        setTimeout(handleCheckboxChange, 100);
+                    }
+                });
+            });
+            
+            // 監聽 DOM 變化（新元素添加時）
+            const observer = new MutationObserver(function(mutations) {
+                let shouldUpdate = false;
+                mutations.forEach(mutation => {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        for (let node of mutation.addedNodes) {
+                            if (node.nodeType === 1 && (
+                                node.querySelector && (
+                                    node.querySelector('input[type="checkbox"]') ||
+                                    node.classList && node.classList.contains('gr-checkbox-group')
+                                )
+                            )) {
+                                shouldUpdate = true;
+                                break;
+                            }
+                        }
+                    }
+                });
+                
+                if (shouldUpdate) {                    setTimeout(() => {
+                        handleCheckboxChange();
+                        addHoverEffects();
+                        enhanceQuestionTitles();
+                        console.log('DOM 變化後更新 checkbox 樣式');
+                    }, 500);
+                }
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+              // 定期檢查（確保效果持續）
+            setInterval(() => {
+                handleCheckboxChange();
+                addHoverEffects();
+                enhanceQuestionTitles();
+            }, 3000);
+            
+            console.log('CheckboxGroup 樣式腳本初始化完成');
+        });
+        </script>
         """
     ) as app:        # 全局狀態管理
         constitution_result_state = gr.State()
@@ -1345,11 +1919,17 @@ def build_main_app():
                     - 如有健康問題請**諮詢醫師**
                     - 建議結合**個人實際情況**調整
                     """, elem_classes=["disclaimer-section"])
-        
-        # 體質分析頁面
+          # 體質分析頁面
         with gr.Column(visible=False, elem_classes=["main-content"]) as constitution_page:
             back_to_home_1 = gr.Button("返回主頁", elem_classes=["back-button"])
-            gr.Markdown("# 中醫體質分析", elem_classes=["page-title"])
+            
+            # 頁面標題區域
+            gr.HTML("""
+            <div class="constitution-hero-section">
+                <h1 class="page-title">🏥 中醫體質分析</h1>
+                <p class="page-subtitle">透過專業的中醫問卷，AI將精準分析您的體質類型並提供個人化建議</p>
+            </div>
+            """)
             
             constitution_result_display, constitution_state_internal = build_constitution_analysis_page()
             
