@@ -47,3 +47,6 @@ venv.bak/
 .conda/
 
 # Gradio 相关
+
+# WeiWei 定義
+model/
