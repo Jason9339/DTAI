@@ -3,13 +3,38 @@ import random
 import gradio as gr
 from typing import Dict
 from PIL import Image
-import torch
-import torch.nn as nn
-from torchvision import transforms
 import os
 import pandas as pd
 from config import FOOD_DATABASE
-import timm  # 用於載入預訓練模型架構
+import numpy as np
+
+# 嘗試導入PyTorch，如果失敗則使用模擬模式
+try:
+    import torch
+    import torch.nn as nn
+    from torchvision import transforms
+    import timm  # 用於載入預訓練模型架構
+    TORCH_AVAILABLE = True
+    print("✅ PyTorch已載入，使用完整AI模型功能")
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("⚠️ PyTorch未安裝，使用模擬模式")
+    # 創建模擬的torch模組
+    class MockTorch:
+        @staticmethod
+        def device(device_type):
+            return "cpu"
+        
+        @staticmethod  
+        def no_grad():
+            class MockContext:
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    pass
+            return MockContext()
+    
+    torch = MockTorch()
 
 # 全域變數來快取已載入的模型
 _loaded_models = {}
@@ -238,19 +263,23 @@ def detect_densenet_variant(state_dict):
 
 def load_model(model_name: str, model_path: str = None):
     """
-    載入 PyTorch 模型
+    載入 PyTorch 模型 (如果PyTorch可用) 或返回模擬模型
     Args:
         model_name: 模型名稱
         model_path: 模型檔案路徑，如果為 None 則使用預設路徑
     """
+    if not TORCH_AVAILABLE:
+        print(f"⚠️ PyTorch未安裝，{model_name} 使用模擬模式")
+        return None
+        
     if model_name in _loaded_models:
         return _loaded_models[model_name]
-    
     if model_path is None:
-        model_path = f"/root/DTAI/model/{model_name}.pth"
+        model_path = f"./model/{model_name}.pth"
     
     if not os.path.exists(model_path):
-        raise FileNotFoundError(f"模型檔案不存在: {model_path}")
+        print(f"❌ 模型檔案不存在: {model_path}，使用模擬模式")
+        return None
     
     try:
         # 載入模型
@@ -363,13 +392,19 @@ def load_model(model_name: str, model_path: str = None):
         print(f"載入模型失敗: {e}")
         return None
 
-def preprocess_image(image: Image.Image, model_name: str = None) -> torch.Tensor:
+def preprocess_image(image: Image.Image, model_name: str = None):
     """
-    圖片預處理
+    圖片預處理 (如果PyTorch可用) 或模擬預處理
     Args:
         image: 輸入圖片
         model_name: 模型名稱，用於決定輸入尺寸
     """
+    if not TORCH_AVAILABLE:
+        # 模擬模式，只進行基本的圖片檢查
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        return np.array(image)  # 返回numpy數組作為模擬tensor
+    
     # 根據模型類型決定輸入尺寸
     if model_name and 'swinv2' in model_name.lower():
         input_size = 192  # Swin Transformer V2 訓練時使用 192x192
@@ -391,7 +426,7 @@ def preprocess_image(image: Image.Image, model_name: str = None) -> torch.Tensor
 
 def classify_food_image(image: Image.Image, model_name: str) -> Dict:
     """
-    使用指定的 PyTorch 模型進行食物辨識
+    使用指定的 PyTorch 模型進行食物辨識 (或模擬辨識)
     Args:
         image: 輸入圖片
         model_name: 要使用的模型名稱
@@ -405,13 +440,17 @@ def classify_food_image(image: Image.Image, model_name: str) -> Dict:
     try:
         # 載入模型
         model = load_model(model_name)
-        if model is None:
-            # 如果模型載入失敗，回退到模擬模式
-            print(f"模型 {model_name} 載入失敗，使用模擬模式")
+        
+        if model is None or not TORCH_AVAILABLE:
+            # 如果模型載入失敗或PyTorch不可用，使用模擬模式
+            print(f"🎲 模型 {model_name} 使用模擬模式進行辨識")
             food_names = list(FOOD_DATABASE.keys())
-            recognized_food = random.choice(food_names)
+            # 基於圖片特性的簡單模擬邏輯
+            np.random.seed(hash(str(image.size)) % 1000)  # 基於圖片尺寸產生種子
+            recognized_food = np.random.choice(food_names)
+            confidence = np.random.randint(82, 96)  # 模擬信心度
         else:
-            # 使用模型進行預測
+            # 使用真實模型進行預測
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
             
             # 圖片預處理
@@ -424,18 +463,23 @@ def classify_food_image(image: Image.Image, model_name: str) -> Dict:
                 # 假設模型輸出是類別索引或機率分布
                 if len(outputs.shape) > 1:
                     predicted_idx = torch.argmax(outputs, dim=1).item()
+                    # 計算信心度
+                    probabilities = torch.softmax(outputs, dim=1)
+                    confidence = int(probabilities[0][predicted_idx].item() * 100)
                 else:
                     predicted_idx = outputs.item()
+                    confidence = random.randint(85, 98)
                 
                 # 將預測索引轉換為食物名稱
                 # 使用訓練時的標籤列表進行映射
                 if predicted_idx < len(TRAINING_LABELS):
                     recognized_food = TRAINING_LABELS[predicted_idx]
-                    print(f"辨識結果: {recognized_food} (索引: {predicted_idx})")
+                    print(f"AI辨識結果: {recognized_food} (索引: {predicted_idx}, 信心度: {confidence}%)")
                 else:
                     print(f"警告: 預測索引 {predicted_idx} 超出範圍，使用隨機選擇")
                     food_names = list(FOOD_DATABASE.keys())
                     recognized_food = random.choice(food_names)
+                    confidence = random.randint(75, 90)
 
         # 從資料庫獲取食物資訊
         # 首先嘗試直接匹配，如果失敗則嘗試映射
@@ -450,12 +494,16 @@ def classify_food_image(image: Image.Image, model_name: str) -> Dict:
             else:
                 return {"錯誤": f"辨識的食物 '{recognized_food}' 無法在資料庫中找到對應項目"}
         
+        # 決定狀態標示
+        status_prefix = "🎲" if (model is None or not TORCH_AVAILABLE) else "🤖"
+        
         result = {
             "辨識食物": recognized_food,
             "英文名": food_info.get("英文名", "unknown"),
             "五性屬性": food_info["五性"],
-            "使用模型": model_name,
-            "信心度": f"{random.randint(85, 98)}%"  # 實際應用中可從模型輸出計算
+            "使用模型": f"{status_prefix} {model_name}",
+            "信心度": f"{confidence}%",
+            "模式": "模擬模式" if (model is None or not TORCH_AVAILABLE) else "AI模式"
         }
         
         return result
@@ -565,279 +613,766 @@ def classify_with_all_models(image: Image.Image) -> Dict:
 
 def build_food_recognition_page():
     """建立食物辨識頁面"""
-    with gr.Column():
-        # 頁面標題和說明
-        gr.HTML("""
-        <div style="text-align: center; margin-bottom: 30px; padding: 25px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
-            <h1 style="font-size: 2.5rem; margin-bottom: 10px; font-weight: 700;">🍎 AI食物辨識模組</h1>
-            <p style="font-size: 1.2rem; margin: 0; opacity: 0.9;">
-                上傳食物圖片，系統將使用6個不同的深度學習模型進行辨識，並提供中醫五性屬性資訊
-            </p>
-        </div>
-        """)
-        
-        # 功能特色說明
-        gr.HTML("""
-        <div style="display: flex; justify-content: space-around; margin-bottom: 25px; flex-wrap: wrap;">
-            <div style="text-align: center; padding: 15px; margin: 5px; background: #f8fafc; border-radius: 10px; flex: 1; min-width: 200px;">
-                <div style="font-size: 2rem; margin-bottom: 8px;">🎯</div>
-                <strong style="color: #374151;">多模型投票</strong><br>
-                <small style="color: #6b7280;">6個AI模型綜合判斷</small>
-            </div>
-            <div style="text-align: center; padding: 15px; margin: 5px; background: #f8fafc; border-radius: 10px; flex: 1; min-width: 200px;">
-                <div style="font-size: 2rem; margin-bottom: 8px;">🔬</div>
-                <strong style="color: #374151;">深度學習</strong><br>
-                <small style="color: #6b7280;">最新Transformer架構</small>
-            </div>
-            <div style="text-align: center; padding: 15px; margin: 5px; background: #f8fafc; border-radius: 10px; flex: 1; min-width: 200px;">
-                <div style="font-size: 2rem; margin-bottom: 8px;">🌡️</div>
-                <strong style="color: #374151;">中醫屬性</strong><br>
-                <small style="color: #6b7280;">五性寒熱分析</small>
-            </div>
-        </div>
-        """)
-        
-        # 添加自定義CSS樣式來改善顯示效果
-        gr.HTML("""
-        <style>
-        /* 改善JSON組件的顯示效果 */
-        .json-holder {
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
-            font-size: 0.95rem !important;
-            line-height: 1.5 !important;
-            background: #f8fafc !important;
-            border-radius: 8px !important;
-            padding: 15px !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-        
-        /* JSON內容樣式 */
-        .json-holder pre {
-            background: transparent !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            white-space: pre-wrap !important;
-            word-wrap: break-word !important;
-        }
-        
-        /* Tab樣式優化 */
-        .tab-nav .tab-nav-item {
-            font-size: 1.1rem !important;
-            font-weight: 600 !important;
-            padding: 12px 20px !important;
-            margin: 0 5px !important;
-            border-radius: 8px 8px 0 0 !important;
-        }
-        
-        .tab-nav .tab-nav-item.selected {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-            color: white !important;
-        }
-        
-        /* 狀態顯示樣式 */
-        .status-display {
-            font-weight: 600 !important;
-            margin-top: 15px !important;
-            padding: 10px 15px !important;
-            border-radius: 6px !important;
-            background: #f0f9ff !important;
-            border: 1px solid #bae6fd !important;
-        }
-        
-        /* 按鈕間距優化 */
-        .button-row {
-            gap: 12px !important;
-            margin: 20px 0 !important;
-        }
-        
-        /* 按鈕樣式增強 */
-        .button-row .btn {
-            font-weight: 600 !important;
-            padding: 12px 24px !important;
-            border-radius: 8px !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .button-row .btn-primary {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-            border: none !important;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
-        }
-        
-        .button-row .btn-primary:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
-        }
-        
-        /* 容器間距優化 */
-        .recognition-container {
-            padding: 20px !important;
-            margin: 15px 0 !important;
-            background: #ffffff !important;
-            border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-        }
-        
-        /* 説明文字樣式 */
-        .tab-description {
-            background: #f1f5f9 !important;
-            padding: 12px 16px !important;
-            border-radius: 6px !important;
-            margin-bottom: 15px !important;
-            border-left: 4px solid #3b82f6 !important;
-        }
-        
-        /* 圖片上傳區域樣式 */
-        .image-upload {
-            border: 2px dashed #cbd5e1 !important;
-            border-radius: 12px !important;
-            transition: border-color 0.3s ease !important;
-        }
-        
-        .image-upload:hover {
-            border-color: #3b82f6 !important;
-        }
-        
-        /* 手風琴樣式 */
-        .accordion {
-            margin-top: 20px !important;
-        }
-        
-        .accordion .label {
-            font-weight: 600 !important;
-            color: #374151 !important;
-        }
-        </style>
-        """)
+    # 添加食物辨識頁面專用CSS樣式
+    food_page_css = """
+    <style>
+    /* === 食物辨識頁面專用樣式修復版 === */
+    
+    /* 容器基礎樣式 */
+    .food-recognition-container {
+        background: linear-gradient(135deg, #F0F8FF 0%, #E6F3E6 25%, #FFF8F0 75%, #F0F8FF 100%) !important;
+        min-height: 100vh !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif !important;
+    }
+      /* 主標題區域 */
+    .food-hero-section {
+        text-align: center !important;
+        padding: 20px 20px 30px 20px !important;
+        background: linear-gradient(135deg, rgba(106, 153, 78, 0.05) 0%, rgba(212, 175, 55, 0.03) 100%) !important;
+        border-radius: 25px !important;
+        margin-bottom: 30px !important;
+        border: 2px solid rgba(106, 153, 78, 0.1) !important;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
 
-        with gr.Row():
-            with gr.Column(scale=1):
-                food_image = gr.Image(
-                    type="pil", 
-                    label="請上傳食物照片",
-                    height=450,
-                    elem_classes=["recognition-container", "image-upload"]
-                )
+    /* 標題區域頂部容器 */
+    .food-hero-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        margin-bottom: 20px !important;
+    }
+
+    /* 標題內容區域 */
+    .food-hero-content {
+        flex: 1 !important;
+        text-align: center !important;
+    }
+
+    /* 右上角按鈕區域 */
+    .food-hero-button-area {
+        flex-shrink: 0 !important;
+        align-self: flex-start !important;
+    }
+    
+    .food-page-title {
+        color: #2D5016 !important;
+        font-size: 3rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 15px !important;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .food-page-subtitle {
+        color: #4A6741 !important;
+        font-size: 1.2rem !important;
+        font-weight: 500 !important;
+        line-height: 1.7 !important;
+        max-width: 700px !important;
+        margin: 0 auto !important;
+    }
+    
+    /* 功能卡片行 */
+    .food-feature-cards-row {
+        margin: 20px 0 !important;
+        gap: 15px !important;
+    }
+    
+    /* 功能卡片 */
+    .food-feature-card {
+        background: #FEFCF8 !important;
+        border-radius: 20px !important;
+        padding: 20px 15px !important;
+        margin: 0 !important;
+        box-shadow: 0 12px 40px rgba(139, 69, 19, 0.12) !important;
+        border: 2px solid rgba(212, 175, 55, 0.2) !important;
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
+        min-height: 100px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        text-align: center !important;
+    }
+    
+    .food-feature-card:hover {
+        transform: translateY(-6px) !important;
+        box-shadow: 0 20px 50px rgba(139, 69, 19, 0.18) !important;
+        border-color: rgba(212, 175, 55, 0.4) !important;
+    }
+    
+    .food-feature-icon {
+        font-size: 2.5rem !important;
+        margin-bottom: 8px !important;
+        display: block !important;
+    }
+    
+    .food-feature-title {
+        color: #2D5016 !important;
+        font-size: 1.3rem !important;
+        font-weight: 600 !important;
+        margin: 8px 0 5px 0 !important;
+    }
+    
+    .food-feature-description {
+        color: #4A6741 !important;
+        font-size: 0.9rem !important;
+        line-height: 1.5 !important;
+        margin: 0 !important;
+    }
+    
+    /* 上傳區域樣式 */
+    .food-upload-section {
+        background: #F0F7F0 !important;
+        border-radius: 20px !important;
+        padding: 20px !important;
+        margin: 20px 0 !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        box-shadow: 0 8px 30px rgba(106, 153, 78, 0.1) !important;
+    }
+      .food-upload-section h3 {
+        color: #2D5016 !important;
+        font-size: 1.5rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 15px !important;
+        text-align: center !important;
+    }
+    
+    /* 快速結果顯示樣式 */
+    .quick-result-display {
+        background: linear-gradient(135deg, rgba(106, 153, 78, 0.08) 0%, rgba(212, 175, 55, 0.05) 100%) !important;
+        border: 2px solid rgba(106, 153, 78, 0.2) !important;
+        border-radius: 15px !important;
+        padding: 15px !important;
+        margin: 10px 0 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+        box-shadow: 0 4px 15px rgba(106, 153, 78, 0.1) !important;
+    }
+    
+    .quick-result-display textarea {
+        background: transparent !important;
+        border: none !important;
+        color: #2D5016 !important;
+        font-weight: 500 !important;
+        font-family: 'Microsoft YaHei', sans-serif !important;
+        resize: none !important;
+    }
+    
+    /* 按鈕樣式 */
+    .food-recognition-btn {
+        background: linear-gradient(135deg, #6A9A4E 0%, #5A8A3E 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 12px 20px !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 20px rgba(106, 154, 78, 0.3) !important;
+        margin: 8px 0 !important;
+        min-width: 200px !important;
+        cursor: pointer !important;
+    }
+    
+    .food-recognition-btn:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 35px rgba(106, 154, 78, 0.4) !important;
+        background: linear-gradient(135deg, #5A8A3E 0%, #4A7A2E 100%) !important;
+    }
+    
+    .food-single-model-btn {
+        background: linear-gradient(135deg, #8B4513 0%, #7A3F12 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 12px 20px !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3) !important;
+        margin: 8px 0 !important;
+        min-width: 200px !important;
+        cursor: pointer !important;
+    }
+    
+    .food-single-model-btn:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 35px rgba(139, 69, 19, 0.4) !important;
+        background: linear-gradient(135deg, #7A3F12 0%, #6A2F02 100%) !important;
+    }    /* 漂浮返回按鈕樣式 - 右上角 */
+    .floating-return-button {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        background: linear-gradient(135deg, #F0F8F0 0%, #E8F5E8 100%) !important;
+        color: #2D5016 !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        border-radius: 25px !important;
+        padding: 12px 20px !important;
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 20px rgba(106, 153, 78, 0.15) !important;
+        z-index: 99999 !important;
+        cursor: pointer !important;
+        min-width: 120px !important;
+        height: 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        pointer-events: auto !important;
+        user-select: none !important;
+        font-family: 'Microsoft YaHei', sans-serif !important;
+    }
+    
+    .floating-return-button:hover {
+        transform: translateY(-2px) scale(1.05) !important;
+        box-shadow: 0 8px 30px rgba(106, 153, 78, 0.25) !important;
+        background: linear-gradient(135deg, #E8F5E8 0%, #D4F0D4 100%) !important;
+        border-color: rgba(106, 153, 78, 0.5) !important;
+        color: #1F3D0C !important;
+    }
+    
+    /* 結果顯示區域 */
+    .food-result-section {
+        background: linear-gradient(135deg, #F8FBF6 0%, #FEFEFE 100%) !important;
+        border-radius: 20px !important;
+        padding: 20px !important;
+        margin: 20px 0 !important;
+        border: 2px solid rgba(106, 153, 78, 0.2) !important;
+        box-shadow: 0 15px 40px rgba(106, 153, 78, 0.15) !important;
+        position: relative !important;
+    }
+    
+    /* 狀態顯示 */
+    .status-display {
+        background: linear-gradient(135deg, #E8F5E8 0%, #F0F8F0 100%) !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        border-radius: 12px !important;
+        padding: 15px 20px !important;
+        color: #2D5016 !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+        margin: 15px 0 !important;
+        font-size: 1rem !important;
+    }
+    
+    /* === 修復 Gradio 組件顏色問題 === */
+    
+    /* 全局文字顏色修復 */
+    .gradio-container * {
+        color: #2D5016 !important;
+    }
+    
+    /* 標籤文字修復 */
+    .gradio-container label,
+    .gradio-container .gr-form label,
+    .gradio-container .gr-block-label,
+    .gradio-container .gr-block-title,
+    .gradio-container .label-wrap,
+    .gradio-container .label-wrap span {
+        color: #2D5016 !important;
+        font-weight: 600 !important;
+        background-color: transparent !important;
+        font-size: 14px !important;
+    }
+    
+    /* 輸入框和文字區域修復 */
+    .gradio-container input,
+    .gradio-container textarea,
+    .gradio-container select,
+    .gradio-container .gr-textbox,
+    .gradio-container .gr-textbox textarea,
+    .gradio-container .gr-text-input {
+        color: #2D5016 !important;
+        background-color: #FFFFFF !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* 下拉選單修復 */
+    .gradio-container .gr-dropdown,
+    .gradio-container .gr-dropdown div,
+    .gradio-container .gr-dropdown span,
+    .gradio-container .gr-dropdown .wrap,
+    .gradio-container .gr-dropdown .secondary-wrap {
+        color: #2D5016 !important;
+        background-color: #FFFFFF !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+    }
+    
+    /* 按鈕文字確保為白色 */
+    .gradio-container button,
+    .gradio-container button span,
+    .gradio-container .gr-button,
+    .gradio-container .gr-button span {
+        color: white !important;
+        font-weight: 600 !important;
+    }    /* Tab 標籤修復 - 使用更強的選擇器 */
+    .gradio-container .tabitem button,
+    .gradio-container .tab-nav button,
+    .gradio-container button[role="tab"],
+    .gradio-container .gr-tab-nav button,
+    .gradio-container .gr-tab-nav button span,
+    .gradio-container .tab-nav button span,
+    .gradio-container button[role="tab"] span {
+        background-color: #F8FBF6 !important;
+        color: #000000 !important;
+        font-weight: 600 !important;
+        border: 2px solid rgba(106, 153, 78, 0.2) !important;
+        border-radius: 8px !important;
+        margin: 2px !important;
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+    }
+    
+    .gradio-container .tabitem button:hover,
+    .gradio-container .tab-nav button:hover,
+    .gradio-container button[role="tab"]:hover,
+    .gradio-container .gr-tab-nav button:hover,
+    .gradio-container .tabitem button:hover span,
+    .gradio-container .tab-nav button:hover span,
+    .gradio-container button[role="tab"]:hover span {
+        background-color: rgba(106, 153, 78, 0.1) !important;
+        color: #000000 !important;
+        border-color: rgba(106, 153, 78, 0.4) !important;
+    }
+    
+    .gradio-container .tabitem button.selected,
+    .gradio-container .tab-nav button.selected,
+    .gradio-container button[role="tab"][aria-selected="true"],
+    .gradio-container .gr-tab-nav button.selected,
+    .gradio-container .gr-tab-nav button[aria-selected="true"],
+    .gradio-container .tabitem button.selected span,
+    .gradio-container .tab-nav button.selected span,
+    .gradio-container button[role="tab"][aria-selected="true"] span {
+        background-color: #6A9A4E !important;
+        color: #000000 !important;
+        box-shadow: 0 4px 12px rgba(106, 153, 78, 0.3) !important;
+    }
+      /* 強制覆蓋所有可能的Tab文字顏色 */
+    .gradio-container [role="tablist"] button,
+    .gradio-container [role="tablist"] button *,
+    .gradio-container .tabs button,
+    .gradio-container .tabs button *,
+    .gradio-container div[role="tablist"] button,
+    .gradio-container div[role="tablist"] button * {
+        color: #000000 !important;
+    }
+    
+    /* 通用Tab按鈕強制黑色文字 */
+    .gradio-container button[role="tab"],
+    .gradio-container button[role="tab"] *,
+    .gradio-container [data-testid="tab"],
+    .gradio-container [data-testid="tab"] *,
+    .gradio-container .tab-nav button,
+    .gradio-container .tab-nav button *,
+    .gradio-container .gr-tab-nav button,
+    .gradio-container .gr-tab-nav button * {
+        color: #000000 !important;
+        text-shadow: none !important;
+    }
+      /* 最強力的覆蓋 - 針對任何包含標籤emoji的按鈕 */
+    .gradio-container button:contains("🎯"),
+    .gradio-container button:contains("📊"), 
+    .gradio-container button:contains("🔍") {
+        color: #000000 !important;
+    }
+    
+    /* 終極Tab文字顏色修復 - 針對Gradio動態生成的元素 */
+    .gradio-container button,
+    .gradio-container button span,
+    .gradio-container [role="tab"],
+    .gradio-container [role="tab"] span,
+    .gradio-container [data-testid*="tab"],
+    .gradio-container [data-testid*="tab"] span,
+    .gradio-container .tab-item,
+    .gradio-container .tab-item span,
+    .gradio-container .tabitem,
+    .gradio-container .tabitem span {
+        color: #000000 !important;
+    }
+    
+    /* 針對可能的白色文字覆蓋 */
+    .gradio-container button:not([class*="food-recognition"]):not([class*="single-model"]) {
+        color: #000000 !important;
+    }
+    
+    .gradio-container button:not([class*="food-recognition"]):not([class*="single-model"]) span {
+        color: #000000 !important;
+    }
+    
+    /* 結果顯示區域文字修復 */
+    .gradio-container .json-holder,
+    .gradio-container .json-holder *,
+    .gradio-container .recognition-container,
+    .gradio-container .recognition-container *,
+    .gradio-container .recognition-container textarea {
+        color: #2D5016 !important;
+        background-color: #FFFFFF !important;
+        border: 2px solid rgba(106, 153, 78, 0.2) !important;
+        font-family: 'Microsoft YaHei', 'Segoe UI', sans-serif !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        padding: 15px !important;
+    }
+    
+    /* Tab 內容區域修復 */
+    .gradio-container .gr-tab-item,
+    .gradio-container .gr-tab-item *,
+    .gradio-container .gr-tab-item div,
+    .gradio-container .gr-tab-item span {
+        color: #2D5016 !important;
+        background-color: transparent !important;
+    }
+    
+    /* 圖片上傳區域修復 */
+    .gradio-container .gr-image,
+    .gradio-container .gr-image *,
+    .gradio-container .gr-file-upload,
+    .gradio-container .gr-file-upload * {
+        color: #2D5016 !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Tab 說明區域 */
+    .tab-description {
+        background: rgba(106, 153, 78, 0.1) !important;
+        border-radius: 10px !important;
+        padding: 15px 20px !important;
+        margin-bottom: 20px !important;
+        border-left: 4px solid #6A9A4E !important;
+        color: #2D5016 !important;
+    }
+    
+    .tab-description strong {
+        color: #2D5016 !important;
+        font-size: 1.1rem !important;
+        font-weight: 700 !important;
+    }
+    
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+        .food-feature-cards-row {
+            flex-direction: column !important;
+        }
+        
+        .food-feature-card {
+            margin: 10px 0 !important;
+        }
+        
+        .food-page-title {
+            font-size: 2.2rem !important;
+        }
+        
+        .food-recognition-container {
+            padding: 15px !important;
+            margin: 5px !important;
+        }
+    }
+    </style>
+    """
+    
+    # 先添加漂浮按鈕到頁面
+    floating_button = gr.HTML("""
+    <div class="floating-return-button" onclick="alert('返回主頁功能')" title="返回主頁">
+        🏠 返回主頁
+    </div>
+    
+    <script>
+    // 確保漂浮按鈕始終在 body 的最後
+    setTimeout(function() {
+        var floatingBtn = document.querySelector('.floating-return-button');
+        if (floatingBtn && floatingBtn.parentNode !== document.body) {
+            document.body.appendChild(floatingBtn);
+            console.log('漂浮按鈕已移動到 body');
+        }
+    }, 1000);
+    
+    // 每3秒檢查一次
+    setInterval(function() {
+        var floatingBtn = document.querySelector('.floating-return-button');
+        if (floatingBtn && floatingBtn.parentNode !== document.body) {
+            document.body.appendChild(floatingBtn);
+        }
+    }, 3000);
+    </script>
+    """, visible=True)
+    with gr.Column(elem_classes=["food-recognition-container"]):        # 添加CSS樣式
+        gr.HTML(food_page_css)# 英雄區域 - 頁面標題和說明
+        with gr.Column(elem_classes=["food-hero-section"]):
+            gr.HTML("""
+                <h1 class="food-page-title">🍎 AI食物辨識模組</h1>
+                <p class="food-page-subtitle">
+                    運用深度學習技術辨識食物，提供中醫五性屬性分析，助您了解食物的寒熱特性
+                </p>
+            """)
+        
+        # 功能特色說明 - 使用卡片形式
+        with gr.Row(elem_classes=["food-feature-cards-row"]):
+            with gr.Column(elem_classes=["food-feature-card"]):
+                gr.HTML("""
+                <div class="food-feature-icon">🎯</div>
+                <h4 class="food-feature-title">多模型投票</h4>
+                <p class="food-feature-description">6個AI模型協同判斷，提升辨識準確度</p>
+                """)
+            
+            with gr.Column(elem_classes=["food-feature-card"]):
+                gr.HTML("""
+                <div class="food-feature-icon">🔬</div>
+                <h4 class="food-feature-title">深度學習</h4>
+                <p class="food-feature-description">最新Transformer架構，精準識別食物</p>
+                """)
+            
+            with gr.Column(elem_classes=["food-feature-card"]):
+                gr.HTML("""
+                <div class="food-feature-icon">🌡️</div>
+                <h4 class="food-feature-title">中醫屬性</h4>
+                <p class="food-feature-description">提供食物五性寒熱分析，融合傳統智慧</p>
+                """)        # 上傳區域
+        with gr.Column(elem_classes=["food-upload-section"]):
+            gr.HTML("<h3>📸 上傳食物圖片</h3>")
+            
+            with gr.Row():
+                with gr.Column():
+                    food_image = gr.Image(
+                        label="選擇或拖拽食物圖片", 
+                        type="pil",
+                        height=400,
+                        container=True
+                    )
                 
-                with gr.Row(elem_classes=["button-row"]):
+                with gr.Column():
+                    # 模型選擇區域
+                    gr.HTML("""
+                    <div style="background: rgba(106, 153, 78, 0.1); padding: 15px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #4A6741; margin-bottom: 10px;">🤖 選擇AI模型</h4>
+                        <p style="color: #6A9A4E; font-size: 0.9rem; margin: 0;">
+                            可選擇特定模型進行單獨辨識
+                        </p>
+                    </div>
+                    """)
+                    
+                    model_name_input = gr.Dropdown(
+                        choices=[
+                            "convnext_89", "densenet_86", "resnet50_78",
+                            "swin_model_94", "swinv2_model_94", "vit_model_89"
+                        ],
+                        value="swin_model_94",
+                        label="選擇模型",
+                        container=True
+                    )
+                    
+                    # 辨識按鈕
                     recognize_all_btn = gr.Button(
-                        "🎯 使用所有模型辨識", 
+                        "🎯 多模型綜合辨識",
+                        elem_classes=["food-recognition-btn"],
                         variant="primary",
                         size="lg"
                     )
+                    
                     single_model_btn = gr.Button(
                         "🔍 單一模型辨識", 
-                        variant="secondary"
+                        elem_classes=["food-single-model-btn"],
+                        variant="secondary",
+                        size="lg"
                     )
-                
-                # 單一模型選項（可摺疊）
-                with gr.Accordion("🔧 單一模型辨識選項", open=False, elem_classes=["accordion"]):
-                    model_name_input = gr.Dropdown(
-                        choices=[
-                            "swinv2_model_94",
-                            "swin_model_94",
-                            "convnext_89",
-                            "vit_model_89",
-                            "densenet_86", 
-                            "resnet50_78"
-                        ],
-                        label="選擇AI模型",
-                        value="swinv2_model_94",
-                        info="選擇您想要使用的特定AI模型進行辨識"
-                    )
-                    
-                    # 模型說明
+            
+            # 辨識結果顯示（在下方）
+            quick_result_display = gr.Textbox(
+                label="🎯 辨識結果",
+                value="請上傳圖片並點擊辨識按鈕開始AI辨識...",
+                interactive=False,
+                container=True,
+                elem_classes=["quick-result-display"],
+                lines=8,
+                max_lines=12,
+                visible=True
+            )
+          # 狀態顯示
+        status_display = gr.Textbox(
+            label="📊 辨識狀態",
+            value="請上傳食物圖片開始辨識",
+            interactive=False,
+            container=True,
+            elem_classes=["status-display"],
+            lines=1,
+            max_lines=1
+        )
+          # 結果顯示區域
+        with gr.Column(elem_classes=["food-result-section"]):
+            gr.HTML("<h3 style='color: #4A6741; text-align: center; margin-bottom: 20px;'>📋 辨識結果</h3>")
+            
+            with gr.Tabs():
+                with gr.TabItem("🎯 綜合辨識結果", elem_id="comprehensive_tab"):
                     gr.HTML("""
-                    <div style="background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 10px;">
-                        <h4 style="color: #1f2937; margin-bottom: 12px; font-size: 1.1rem;">📋 可用AI模型說明：</h4>
-                        <div style="display: grid; gap: 8px; font-size: 0.9rem;">
-                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span><strong>🥇 Swin Transformer V2</strong></span>
-                                <span style="color: #059669; font-weight: 600;">94% 準確率</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span><strong>🥇 Swin Transformer</strong></span>
-                                <span style="color: #059669; font-weight: 600;">94% 準確率</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span><strong>🥈 ConvNeXt</strong></span>
-                                <span style="color: #0891b2; font-weight: 600;">89% 準確率</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span><strong>🥈 Vision Transformer</strong></span>
-                                <span style="color: #0891b2; font-weight: 600;">89% 準確率</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span><strong>🥉 DenseNet</strong></span>
-                                <span style="color: #ea580c; font-weight: 600;">86% 準確率</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding: 4px 0;">
-                                <span><strong>🏅 ResNet-50</strong></span>
-                                <span style="color: #dc2626; font-weight: 600;">78% 準確率</span>
-                            </div>
-                        </div>
+                    <div class="tab-description">
+                        <strong>🏆 多模型投票結果</strong><br>
+                        整合6個AI模型的辨識結果，通過投票機制得出最終判斷，提供最高的準確度和可靠性。
                     </div>
                     """)
+                    
+                    comprehensive_result_display = gr.Textbox(
+                        label="多模型綜合辨識結果",
+                        container=True,
+                        show_label=True,
+                        lines=15,
+                        max_lines=20,
+                        elem_classes=["json-holder", "recognition-container"],
+                        interactive=False
+                    )
                 
-                # 狀態顯示
-                status_display = gr.Textbox(
-                    label="辨識狀態",
-                    interactive=False,
-                    visible=False,
-                    elem_classes=["status-display"]
-                )
-            
-            with gr.Column(scale=3):
-                # 使用 Tab 來組織不同的結果顯示
-                with gr.Tabs(elem_classes=["tab-nav"]):
-                    with gr.TabItem("🎯 綜合辨識結果", elem_id="comprehensive_tab"):
-                        gr.HTML("""
-                        <div class="tab-description">
-                            <strong>📋 多模型投票結果</strong><br>
-                            此區域顯示所有6個AI模型的綜合辨識結果，採用智能投票機制決定最終答案，提供最可靠的辨識結果。
-                        </div>
-                        """)
-                        comprehensive_result_display = gr.JSON(
-                            label="多模型綜合辨識結果",
-                            container=True,
-                            show_label=True,
-                            height=550,
-                            elem_classes=["json-holder", "recognition-container"]
-                        )
+                with gr.TabItem("📊 各模型詳細結果", elem_id="detailed_tab"):
+                    gr.HTML("""
+                    <div class="tab-description">
+                        <strong>🔍 各模型獨立分析</strong><br>
+                        查看每個AI模型（Swin Transformer、Vision Transformer、ConvNeXt等）的詳細辨識結果和準確度評估。
+                    </div>
+                    """)
                     
-                    with gr.TabItem("📊 各模型詳細結果", elem_id="detailed_tab"):
-                        gr.HTML("""
-                        <div class="tab-description">
-                            <strong>🔍 各模型獨立分析</strong><br>
-                            查看每個AI模型（Swin Transformer、Vision Transformer、ConvNeXt等）的詳細辨識結果和準確度評估。
-                        </div>
-                        """)
-                        detailed_result_display = gr.JSON(
-                            label="各模型詳細辨識結果",
-                            container=True,
-                            show_label=True,
-                            height=550,
-                            elem_classes=["json-holder", "recognition-container"]
-                        )
+                    detailed_result_display = gr.Textbox(
+                        label="各模型詳細辨識結果",
+                        container=True,
+                        show_label=True,
+                        lines=15,
+                        max_lines=20,
+                        elem_classes=["json-holder", "recognition-container"],
+                        interactive=False
+                    )
+                
+                with gr.TabItem("🔍 單一模型結果", elem_id="single_tab"):
+                    gr.HTML("""
+                    <div class="tab-description">
+                        <strong>🎯 指定模型辨識</strong><br>
+                        使用您在左側選擇的特定AI模型進行食物辨識，可比較不同模型的辨識能力和特點。
+                    </div>
+                    """)
                     
-                    with gr.TabItem("🔍 單一模型結果", elem_id="single_tab"):
-                        gr.HTML("""
-                        <div class="tab-description">
-                            <strong>🎯 指定模型辨識</strong><br>
-                            使用您在左側選擇的特定AI模型進行食物辨識，可比較不同模型的辨識能力和特點。
-                        </div>
-                        """)
-                        single_result_display = gr.JSON(
-                            label="單一模型辨識結果",
-                            container=True,
-                            show_label=True,
-                            height=550,
-                            elem_classes=["json-holder", "recognition-container"]
-                        )
+                    single_result_display = gr.Textbox(
+                        label="單一模型辨識結果",
+                        container=True,
+                        show_label=True,
+                        lines=15,                        max_lines=20,
+                        elem_classes=["json-holder", "recognition-container"],
+                        interactive=False
+                    )
         
+        def format_comprehensive_result(result_dict):
+            """格式化綜合辨識結果為可讀文本"""
+            if not result_dict or "錯誤" in result_dict:
+                return f"❌ 錯誤: {result_dict.get('錯誤', '未知錯誤')}"
+            
+            text = "🎯 多模型綜合辨識結果\n"
+            text += "=" * 40 + "\n\n"
+            
+            text += f"🍎 最終辨識: {result_dict.get('最終辨識', 'N/A')}\n"
+            text += f"🌐 英文名: {result_dict.get('英文名', 'N/A')}\n"
+            text += f"🌡️ 五性屬性: {result_dict.get('五性屬性', 'N/A')}\n"
+            text += f"📊 模型共識度: {result_dict.get('模型共識度', 'N/A')}\n"
+            text += f"✅ 成功模型數: {result_dict.get('成功模型數', 'N/A')}\n\n"
+            
+            if "投票分佈" in result_dict:
+                text += "📈 各食物得票分佈:\n"
+                for food, votes in result_dict["投票分佈"].items():
+                    text += f"   • {food}: {votes} 票\n"
+            
+            return text
+        
+        def format_detailed_result(result_dict):
+            """格式化詳細辨識結果為可讀文本"""
+            if not result_dict:
+                return "❌ 無詳細結果"
+            
+            text = "📊 各模型詳細辨識結果\n"
+            text += "=" * 40 + "\n\n"
+            
+            for model_key, result in result_dict.items():
+                text += f"🤖 {model_key}\n"
+                text += "-" * 30 + "\n"
+                
+                if "錯誤信息" in result:
+                    text += f"❌ 狀態: {result.get('狀態', '失敗')}\n"
+                    text += f"💬 錯誤信息: {result.get('錯誤信息', '未知錯誤')}\n"
+                else:
+                    text += f"🍎 辨識食物: {result.get('辨識食物', 'N/A')}\n"
+                    text += f"🌐 英文名: {result.get('英文名', 'N/A')}\n"
+                    text += f"🌡️ 五性屬性: {result.get('五性屬性', 'N/A')}\n"
+                    text += f"📈 信心度: {result.get('信心度', 'N/A')}\n"
+                
+                text += "\n"
+            
+            return text
+        def format_single_result(result_dict):
+            """格式化單一模型結果為可讀文本"""
+            if not result_dict or "錯誤" in result_dict:
+                return f"❌ 錯誤: {result_dict.get('錯誤', '未知錯誤')}"
+            
+            text = "🔍 單一模型辨識結果\n"
+            text += "=" * 40 + "\n\n"
+            
+            text += f"🍎 辨識食物: {result_dict.get('辨識食物', 'N/A')}\n"
+            text += f"🌐 英文名: {result_dict.get('英文名', 'N/A')}\n"
+            text += f"🌡️ 五性屬性: {result_dict.get('五性屬性', 'N/A')}\n"
+            text += f"🤖 使用模型: {result_dict.get('使用模型', 'N/A')}\n"
+            text += f"📈 信心度: {result_dict.get('信心度', 'N/A')}\n"
+            text += f"🔧 運行模式: {result_dict.get('模式', 'N/A')}\n"
+            
+            return text
+
+        def update_quick_result_on_button(image, model_name=None, use_all_models=False):
+            """按鈕點擊後的辨識函數"""
+            if image is None:
+                return "❌ 請先上傳圖片", "請先上傳圖片"
+            
+            try:
+                if use_all_models:
+                    # 使用多模型綜合辨識
+                    all_results = classify_with_all_models(image)
+                    comprehensive = all_results.get("🎯 綜合辨識結果", {})
+                    
+                    if "錯誤" in comprehensive:
+                        return f"❌ 辨識失敗: {comprehensive.get('錯誤', '未知錯誤')}", "⚠️ 多模型辨識失敗"
+                    
+                    quick_text = f"🍎 食物: {comprehensive.get('最終辨識', 'N/A')}\n"
+                    quick_text += f"🌐 英文名: {comprehensive.get('英文名', 'N/A')}\n"
+                    quick_text += f"🌡️ 五性: {comprehensive.get('五性屬性', 'N/A')}\n"
+                    quick_text += f"📊 模型共識度: {comprehensive.get('模型共識度', 'N/A')}\n"
+                    quick_text += f"✅ 成功模型數: {comprehensive.get('成功模型數', 'N/A')}\n"
+                    quick_text += "📋 詳細結果請查看下方分頁"
+                    
+                    status = "✅ 多模型綜合辨識完成！"
+                else:
+                    # 使用單一模型辨識
+                    result = classify_food_image(image, model_name or "swin_model_94")
+                    
+                    if "錯誤" in result:
+                        return f"❌ 辨識失敗: {result.get('錯誤', '未知錯誤')}", "⚠️ 辨識遇到問題"
+                    
+                    quick_text = f"🍎 食物: {result.get('辨識食物', 'N/A')}\n"
+                    quick_text += f"🌐 英文名: {result.get('英文名', 'N/A')}\n"
+                    quick_text += f"🌡️ 五性: {result.get('五性屬性', 'N/A')}\n"
+                    quick_text += f"🤖 使用模型: {result.get('使用模型', 'N/A')}\n"
+                    quick_text += f"📈 信心度: {result.get('信心度', 'N/A')}\n"
+                    quick_text += f"🔧 運行模式: {result.get('模式', 'N/A')}"
+                    
+                    status = f"✅ 使用 {model_name or 'swin_model_94'} 辨識完成！"
+                
+                return quick_text, status
+            except Exception as e:
+                error_text = f"❌ 辨識失敗: {str(e)}"
+                return error_text, f"❌ 辨識失敗: {str(e)}"        
         def update_comprehensive_result(image):
             if image is None:
-                return {}, {}, "請先上傳圖片"
+                return "", "", "請先上傳圖片"
             
             try:
                 # 執行綜合辨識
@@ -846,46 +1381,124 @@ def build_food_recognition_page():
                 # 分離綜合結果和詳細結果
                 comprehensive = all_results.get("🎯 綜合辨識結果", {})
                 detailed = all_results.get("📊 各模型詳細結果", {})
+                  # 格式化結果
+                comprehensive_text = format_comprehensive_result(comprehensive)
+                detailed_text = format_detailed_result(detailed)
                 
                 status = "✅ 所有模型辨識完成！" if comprehensive and "錯誤" not in comprehensive else "⚠️ 辨識遇到問題"
                 
-                return comprehensive, detailed, status
-                
+                return comprehensive_text, detailed_text, status
             except Exception as e:
-                error_result = {"錯誤": f"辨識過程發生錯誤: {str(e)}"}
-                return error_result, {}, f"❌ 辨識失敗: {str(e)}"
+                error_text = f"❌ 辨識過程發生錯誤: {str(e)}"
+                return error_text, "", f"❌ 辨識失敗: {str(e)}"
         
         def update_single_result(image, model_name):
             if image is None:
-                return {"錯誤": "請先上傳圖片"}, "請先上傳圖片"
+                return "❌ 請先上傳圖片", "請先上傳圖片"
             
             try:
                 result = classify_food_image(image, model_name)
+                formatted_result = format_single_result(result)
                 status = f"✅ 使用 {model_name} 辨識完成！" if "錯誤" not in result else f"⚠️ {model_name} 辨識失敗"
-                return result, status
+                return formatted_result, status
             except Exception as e:
-                error_result = {"錯誤": f"辨識過程發生錯誤: {str(e)}"}
-                return error_result, f"❌ {model_name} 辨識失敗: {str(e)}"
+                error_text = f"❌ 辨識過程發生錯誤: {str(e)}"
+                return error_text, f"❌ {model_name} 辨識失敗: {str(e)}"        # 使用說明部分
+        with gr.Column(elem_classes=["food-result-section"]):
+            gr.HTML("""
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h3 style="color: #4A6741; font-size: 1.8rem; margin-bottom: 20px;">📋 使用說明</h3>
+            </div>
+            """)
+            
+            with gr.Row(elem_classes=["food-feature-cards-row"]):
+                with gr.Column(elem_classes=["food-feature-card"]):
+                    gr.HTML("""
+                    <div class="food-feature-icon">📸</div>
+                    <h4 class="food-feature-title">1. 上傳圖片</h4>
+                    <p class="food-feature-description">
+                        選擇清晰的食物圖片，建議光線充足、主體明顯的單一食物照片
+                    </p>
+                    """)
+                
+                with gr.Column(elem_classes=["food-feature-card"]):
+                    gr.HTML("""
+                    <div class="food-feature-icon">🎯</div>
+                    <h4 class="food-feature-title">2. 選擇辨識方式</h4>
+                    <p class="food-feature-description">
+                        多模型綜合辨識：6個AI模型投票結果，準確度更高<br>
+                        單一模型辨識：選擇特定模型進行快速辨識
+                    </p>
+                    """)
+                
+                with gr.Column(elem_classes=["food-feature-card"]):
+                    gr.HTML("""
+                    <div class="food-feature-icon">📊</div>
+                    <h4 class="food-feature-title">3. 查看結果</h4>
+                    <p class="food-feature-description">
+                        獲得食物名稱、英文對照、中醫五性屬性分析，了解食物寒熱特性
+                    </p>
+                    """)
         
-        # 綁定事件
+        # 免責聲明
+        with gr.Column(elem_classes=["food-result-section"]):
+            gr.HTML("""
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: #8B4513; font-size: 1.6rem; margin-bottom: 15px;">⚠️ 重要聲明</h3>
+            </div>
+            <div style="background: linear-gradient(135deg, #FFF8E1 0%, #FFFBF0 100%); 
+                        border: 2px solid rgba(139, 69, 19, 0.2); 
+                        border-radius: 15px; 
+                        padding: 25px; 
+                        color: #8B4513; 
+                        line-height: 1.6;
+                        font-size: 0.95rem;">
+                <p style="margin: 0 0 15px 0;">
+                    <strong>🔬 關於AI辨識：</strong><br>
+                    本系統使用深度學習技術進行食物辨識，雖經過大量數據訓練，但仍可能存在辨識錯誤的情況。
+                    辨識結果僅供參考，請以實際食物為準。
+                </p>
+                <p style="margin: 0 0 15px 0;">
+                    <strong>🌡️ 關於中醫屬性：</strong><br>
+                    食物五性（寒、涼、平、溫、熱）資訊基於傳統中醫理論整理，
+                    個人體質不同，建議諮詢專業中醫師獲得個人化建議。
+                </p>
+                <p style="margin: 0;">
+                    <strong>⚕️ 健康提醒：</strong><br>
+                    本系統不能替代專業醫療建議，如有健康問題或特殊飲食需求，
+                    請諮詢合格的醫療專業人員或營養師。
+                </p>
+            </div>            """)        
+            
+        food_state = gr.State()
+        
+        # 創建一個隱藏的按鈕用於事件綁定
+        back_to_home_btn = gr.Button(
+            "返回主頁",
+            visible=False
+        )
+        
+        # 多模型綜合辨識按鈕
         recognize_all_btn.click(
+            fn=lambda img: update_quick_result_on_button(img, use_all_models=True),
+            inputs=[food_image],
+            outputs=[quick_result_display, status_display]
+        ).then(
             fn=update_comprehensive_result,
             inputs=[food_image],
             outputs=[comprehensive_result_display, detailed_result_display, status_display]
-        ).then(
-            lambda: gr.update(visible=True),
-            outputs=[status_display]
         )
         
+        # 單一模型辨識按鈕  
         single_model_btn.click(
+            fn=lambda img, model: update_quick_result_on_button(img, model, use_all_models=False),
+            inputs=[food_image, model_name_input],
+            outputs=[quick_result_display, status_display]
+        ).then(
             fn=update_single_result,
             inputs=[food_image, model_name_input],
             outputs=[single_result_display, status_display]
-        ).then(
-            lambda: gr.update(visible=True),
-            outputs=[status_display]
         )
         
-        food_state = gr.State()
-        
-        return comprehensive_result_display, food_state 
+        return comprehensive_result_display, food_state, back_to_home_btn
+

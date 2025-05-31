@@ -1940,14 +1940,9 @@ def build_main_app():
                 fn=update_constitution_state,
                 inputs=[constitution_state_internal],
                 outputs=[constitution_result_state]
-            )
-        
-        # 食物辨識頁面
+            )        # 食物辨識頁面
         with gr.Column(visible=False, elem_classes=["main-content"]) as food_page:
-            back_to_home_2 = gr.Button("返回主頁", elem_classes=["back-button"])
-            gr.Markdown("# 食物寒熱辨識", elem_classes=["page-title"])
-            
-            food_result_display, food_state_internal = build_food_recognition_page()
+            food_result_display, food_state_internal, back_to_home_2 = build_food_recognition_page()
             
             def update_food_state(result):
                 return result
@@ -2043,9 +2038,7 @@ def build_main_app():
         advice_btn.click(
             fn=show_advice_page,
             outputs=[home_page, constitution_page, food_page, advice_page, current_page]
-        )
-        
-        # 返回主頁按鈕
+        )        # 返回主頁按鈕
         for back_btn in [back_to_home_1, back_to_home_2, back_to_home_3]:
             back_btn.click(
                 fn=show_home_page,
