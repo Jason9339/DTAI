@@ -88,21 +88,17 @@ def create_model_architecture(model_name: str, num_classes: int = None, state_di
         num_classes: 分類數量，如果為 None 則自動推測
         state_dict: 模型的 state_dict，用於檢測架構變體
     """
-    # 如果沒有指定 num_classes，根據模型名稱推測
+    # 如果沒有指定 num_classes，使用 183 個類別
     if num_classes is None:
-        if 'food101' in model_name.lower():
-            num_classes = 101
-        else:
-            # 先嘗試 183 個類別（可能是自定義資料集）
-            num_classes = 183
+        num_classes = 183
     
     if 'swinv2' in model_name.lower():
         # Swin Transformer V2 - 使用與訓練時相同的模型架構
         model = timm.create_model('swinv2_base_window12_192', 
                                 pretrained=False, 
                                 num_classes=num_classes)
-    elif 'swin' in model_name.lower():
-        # Swin Transformer
+    elif 'swin' in model_name.lower() and 'swinv2' not in model_name.lower():
+        # Swin Transformer V1 - 確保不是 V2
         model = timm.create_model('swin_base_patch4_window7_224', 
                                 pretrained=False, 
                                 num_classes=num_classes)
@@ -112,8 +108,38 @@ def create_model_architecture(model_name: str, num_classes: int = None, state_di
                                 pretrained=False, 
                                 num_classes=num_classes)
     elif 'convnext' in model_name.lower():
-        # ConvNeXt
-        model = timm.create_model('convnext_base', 
+        # ConvNeXt - 使用 torchvision（與用戶訓練程式碼一致）
+        from torchvision import models
+        import torch.nn as nn
+        
+        model = models.convnext_base(weights=None)
+        
+        # 修改分類器的最後一層以匹配類別數
+        model.classifier[2] = nn.Linear(model.classifier[2].in_features, num_classes)
+    elif 'efficientnet' in model_name.lower():
+        # EfficientNet - 使用 torchvision（與用戶訓練程式碼一致）
+        from torchvision import models
+        import torch.nn as nn
+        
+        if 'b5' in model_name.lower():
+            model = models.efficientnet_b5(weights=None)
+        elif 'b4' in model_name.lower():
+            model = models.efficientnet_b4(weights=None)
+        elif 'b3' in model_name.lower():
+            model = models.efficientnet_b3(weights=None)
+        elif 'b2' in model_name.lower():
+            model = models.efficientnet_b2(weights=None)
+        elif 'b1' in model_name.lower():
+            model = models.efficientnet_b1(weights=None)
+        else:
+            # 預設使用 B0
+            model = models.efficientnet_b0(weights=None)
+        
+        # 修改分類器的最後一層以匹配類別數
+        model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
+    elif 'vgg' in model_name.lower():
+        # VGG
+        model = timm.create_model('vgg16', 
                                 pretrained=False, 
                                 num_classes=num_classes)
     elif 'densenet' in model_name.lower():
@@ -218,9 +244,12 @@ def get_num_classes_from_state_dict(state_dict):
     
     # 尋找分類層的權重
     for key in cleaned_state_dict.keys():
-        if 'head.fc.weight' in key or 'classifier.weight' in key or 'fc.weight' in key:
+        # 處理不同模型的分類器命名
+        if ('head.fc.weight' in key or 'classifier.weight' in key or 'fc.weight' in key or 
+            'classifier.1.weight' in key):  # EfficientNet 的分類器
             return cleaned_state_dict[key].shape[0]
-        if 'head.fc.bias' in key or 'classifier.bias' in key or 'fc.bias' in key:
+        if ('head.fc.bias' in key or 'classifier.bias' in key or 'fc.bias' in key or 
+            'classifier.1.bias' in key):  # EfficientNet 的分類器
             return cleaned_state_dict[key].shape[0]
     
     # 如果找不到，使用預設值
@@ -274,6 +303,35 @@ def load_model(model_name: str, model_path: str = None):
         
     if model_name in _loaded_models:
         return _loaded_models[model_name]
+    
+    # 特殊處理 EfficientNet 模型
+    if 'efficientnet' in model_name.lower():
+        model = load_efficientnet_model(model_name, model_path)
+        if model is not None:
+            _loaded_models[model_name] = model
+        return model
+    
+    # 特殊處理 Swin Transformer 模型
+    if 'swin' in model_name.lower():
+        model = load_swin_model(model_name, model_path)
+        if model is not None:
+            _loaded_models[model_name] = model
+        return model
+    
+    # 特殊處理 ConvNeXt 模型
+    if 'convnext' in model_name.lower():
+        model = load_convnext_model(model_name, model_path)
+        if model is not None:
+            _loaded_models[model_name] = model
+        return model
+    
+    # 特殊處理 VGG 模型
+    if 'vgg' in model_name.lower():
+        model = load_vgg_model(model_name, model_path)
+        if model is not None:
+            _loaded_models[model_name] = model
+        return model
+        
     if model_path is None:
         model_path = f"./model/{model_name}.pth"
     
@@ -524,12 +582,14 @@ def classify_with_all_models(image: Image.Image) -> Dict:
     
     # 定義所有可用的模型
     available_models = [
-        "convnext_89",
+        "convnext_90",
         "densenet_86", 
+        "efficientnet_84",
         "resnet50_78",
         "swin_model_94",
         "swinv2_model_94",
-        "vit_model_89"
+        "vgg_model_78",
+        "vit_model_74"
     ]
     
     # 隨機打亂模型順序
@@ -1123,7 +1183,7 @@ def build_food_recognition_page():
                 gr.HTML("""
                 <div class="food-feature-icon">🎯</div>
                 <h4 class="food-feature-title">多模型投票</h4>
-                <p class="food-feature-description">6個AI模型協同判斷，提升辨識準確度</p>
+                <p class="food-feature-description">8個AI模型協同判斷，提升辨識準確度</p>
                 """)
             
             with gr.Column(elem_classes=["food-feature-card"]):
@@ -1164,8 +1224,8 @@ def build_food_recognition_page():
                     
                     model_name_input = gr.Dropdown(
                         choices=[
-                            "convnext_89", "densenet_86", "resnet50_78",
-                            "swin_model_94", "swinv2_model_94", "vit_model_89"
+                            "convnext_90", "densenet_86", "efficientnet_84", "resnet50_78",
+                            "swin_model_94", "swinv2_model_94", "vgg_model_78", "vit_model_74"
                         ],
                         value="swin_model_94",
                         label="選擇模型",
@@ -1217,7 +1277,7 @@ def build_food_recognition_page():
                     gr.HTML("""
                     <div class="tab-description">
                         <strong>🏆 多模型投票結果</strong><br>
-                        整合6個AI模型的辨識結果，通過投票機制得出最終判斷，提供最高的準確度和可靠性。
+                        整合8個AI模型的辨識結果，通過投票機制得出最終判斷，提供最高的準確度和可靠性。
                     </div>
                     """)
                     
@@ -1235,7 +1295,7 @@ def build_food_recognition_page():
                     gr.HTML("""
                     <div class="tab-description">
                         <strong>🔍 各模型獨立分析</strong><br>
-                        查看每個AI模型（Swin Transformer、Vision Transformer、ConvNeXt等）的詳細辨識結果和準確度評估。
+                        查看每個AI模型（Swin Transformer、Vision Transformer、ConvNeXt、EfficientNet、VGG等）的詳細辨識結果和準確度評估。
                     </div>
                     """)
                     
@@ -1478,27 +1538,338 @@ def build_food_recognition_page():
             visible=False
         )
         
-        # 多模型綜合辨識按鈕
+        # 多模型綜合辨識按鈕事件
         recognize_all_btn.click(
-            fn=lambda img: update_quick_result_on_button(img, use_all_models=True),
-            inputs=[food_image],
-            outputs=[quick_result_display, status_display]
-        ).then(
             fn=update_comprehensive_result,
             inputs=[food_image],
-            outputs=[comprehensive_result_display, detailed_result_display, status_display]
+            outputs=[comprehensive_result_display, detailed_result_display, status_display],
+            api_name="recognize_all_food_models",
+            show_progress=True
         )
         
-        # 單一模型辨識按鈕  
+        # 單一模型辨識按鈕事件
         single_model_btn.click(
-            fn=lambda img, model: update_quick_result_on_button(img, model, use_all_models=False),
-            inputs=[food_image, model_name_input],
-            outputs=[quick_result_display, status_display]
-        ).then(
             fn=update_single_result,
             inputs=[food_image, model_name_input],
-            outputs=[single_result_display, status_display]
+            outputs=[single_result_display, status_display],
+            api_name="recognize_single_food_model",
+            show_progress=True
         )
         
-        return comprehensive_result_display, food_state, back_to_home_btn
+        # 返回主頁按鈕事件
+        back_to_home_btn.click(
+            fn=lambda: (gr.update(visible=True), gr.update(visible=False)),
+            inputs=[],
+            outputs=[floating_button, back_to_home_btn],
+            api_name="back_to_home",
+            show_progress=False
+        )
+        
+        # 隱藏返回主頁按鈕
+        floating_button.click(
+            fn=lambda: gr.update(visible=False),
+            inputs=[],
+            outputs=[floating_button],
+            api_name="hide_floating_button",
+            show_progress=False
+        )
+    
+    return quick_result_display, food_state, back_to_home_btn
+
+def load_swin_model(model_name: str, model_path: str = None):
+    """
+    專門載入 Swin Transformer 模型的函數
+    處理 Swin 模型特有的 relative position 參數問題
+    """
+    if model_path is None:
+        model_path = f"./model/{model_name}.pth"
+    
+    if not os.path.exists(model_path):
+        print(f"❌ Swin 模型檔案不存在: {model_path}，使用模擬模式")
+        return None
+    
+    try:
+        print(f"Loading Swin model from {model_path}...")
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # 載入檢查點
+        state_dict = torch.load(model_path, map_location=device)
+        
+        # 處理可能的 DataParallel 或 DistributedDataParallel 包裝
+        if 'module.' in list(state_dict.keys())[0]:
+            # 移除 'module.' 前綴
+            new_state_dict = {}
+            for key, value in state_dict.items():
+                new_key = key.replace('module.', '')
+                new_state_dict[new_key] = value
+            state_dict = new_state_dict
+            print("Removed 'module.' prefix from state dict keys")
+        
+        # 檢測類別數量 - 從 head.fc 或 head.weight 中獲取
+        num_classes = 183  # 預設值
+        if 'head.fc.weight' in state_dict:
+            num_classes = state_dict['head.fc.weight'].shape[0]
+        elif 'head.weight' in state_dict:
+            num_classes = state_dict['head.weight'].shape[0]
+        
+        print(f"Detected {num_classes} classes")
+        
+        # 建立模型架構 - 根據模型名稱選擇正確的架構
+        if 'swinv2' in model_name.lower():
+            # Swin Transformer V2
+            model = timm.create_model('swinv2_base_window12_192', 
+                                    pretrained=False, 
+                                    num_classes=num_classes)
+        else:
+            # Swin Transformer V1 (預設)
+            model = timm.create_model('swin_base_patch4_window7_224', 
+                                    pretrained=False, 
+                                    num_classes=num_classes)
+        
+        # 載入權重
+        try:
+            model.load_state_dict(state_dict)
+            print("Successfully loaded model with all keys matching")
+        except RuntimeError as e:
+            # 如果有不匹配的鍵，使用 strict=False
+            missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
+            
+            # 分析缺失和多餘的鍵
+            swin_specific_keys = []
+            other_missing_keys = []
+            
+            for key in missing_keys:
+                if any(pattern in key for pattern in ['relative_position_bias_table', 'relative_position_index', 'attn_mask']):
+                    swin_specific_keys.append(key)
+                else:
+                    other_missing_keys.append(key)
+            
+            if swin_specific_keys:
+                print(f"✅ Swin 模型特定參數將由模型自動初始化: {len(swin_specific_keys)} 個參數")
+            
+            if other_missing_keys:
+                print(f"⚠️ 其他缺失的鍵: {other_missing_keys}")
+            
+            if unexpected_keys:
+                print(f"⚠️ 未預期的鍵: {unexpected_keys[:10]}...")
+        
+        model = model.to(device)
+        model.eval()
+        
+        print(f"✅ 成功載入 Swin 模型: {model_name} (類別數: {num_classes})")
+        return model
+        
+    except Exception as e:
+        print(f"❌ 載入 Swin 模型失敗: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+def load_efficientnet_model(model_name: str, model_path: str = None):
+    """
+    專門載入 EfficientNet 模型的函數
+    使用標準的 torchvision EfficientNet 架構
+    """
+    if model_path is None:
+        model_path = f"./model/{model_name}.pth"
+    
+    if not os.path.exists(model_path):
+        print(f"❌ EfficientNet 模型檔案不存在: {model_path}，使用模擬模式")
+        return None
+    
+    try:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # 載入檢查點
+        checkpoint = torch.load(model_path, map_location=device)
+        
+        # 提取 state_dict
+        if isinstance(checkpoint, dict):
+            if 'model_state_dict' in checkpoint:
+                state_dict = checkpoint['model_state_dict']
+            elif 'state_dict' in checkpoint:
+                state_dict = checkpoint['state_dict']
+            else:
+                state_dict = checkpoint
+        else:
+            state_dict = checkpoint.state_dict() if hasattr(checkpoint, 'state_dict') else checkpoint
+        
+        # 清理鍵名，去除可能的 module. 前綴（用於處理 DataParallel 訓練的模型）
+        cleaned_state_dict = {}
+        for k, v in state_dict.items():
+            name = k.replace("module.", "") if k.startswith("module.") else k
+            cleaned_state_dict[name] = v
+        
+        # 從 classifier.1 層檢測類別數量
+        num_classes = 183  # 預設值
+        if 'classifier.1.weight' in cleaned_state_dict:
+            num_classes = cleaned_state_dict['classifier.1.weight'].shape[0]
+        elif 'classifier.1.out_features' in cleaned_state_dict:
+            num_classes = cleaned_state_dict['classifier.1.out_features']
+        
+        # 使用標準的 torchvision EfficientNet-B5 架構
+        from torchvision import models
+        import torch.nn as nn
+        
+        model = models.efficientnet_b5(weights=None)  # 不載入預訓練權重
+        
+        # 修改分類器的最後一層以匹配類別數
+        model.classifier[1] = nn.Linear(model.classifier[1].in_features, num_classes)
+        
+        model = model.to(device)
+        
+        # 載入模型權重
+        missing_keys, unexpected_keys = model.load_state_dict(cleaned_state_dict, strict=False)
+        
+        if missing_keys:
+            print(f"⚠️ EfficientNet 缺失的鍵: {missing_keys[:5]}..." if len(missing_keys) > 5 else f"⚠️ EfficientNet 缺失的鍵: {missing_keys}")
+        
+        if unexpected_keys:
+            print(f"⚠️ EfficientNet 未預期的鍵: {unexpected_keys[:5]}..." if len(unexpected_keys) > 5 else f"⚠️ EfficientNet 未預期的鍵: {unexpected_keys}")
+        
+        model.eval()
+        print(f"✅ 成功載入 EfficientNet 模型: {model_name} (類別數: {num_classes})")
+        return model
+        
+    except Exception as e:
+        print(f"❌ 載入 EfficientNet 模型失敗: {e}")
+        return None
+
+def load_convnext_model(model_name: str, model_path: str = None):
+    """專門載入 ConvNeXt 模型的函數"""
+    if model_path is None:
+        model_path = f"./model/{model_name}.pth"
+    
+    if not os.path.exists(model_path):
+        print(f"❌ ConvNeXt 模型檔案不存在: {model_path}，使用模擬模式")
+        return None
+    
+    try:
+        print(f"Loading ConvNeXt model from {model_path}...")
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # 先載入權重檢查類別數
+        checkpoint = torch.load(model_path, map_location=device)
+        
+        # 清理鍵名，移除 module. 前綴（DataParallel 訓練產生的）
+        cleaned_state_dict = {}
+        for k, v in checkpoint.items():
+            name = k.replace("module.", "") if k.startswith("module.") else k
+            cleaned_state_dict[name] = v
+        
+        # 檢測類別數（ConvNeXt 的分類器在 classifier.2）
+        classifier_key = 'classifier.2.weight'
+        num_classes = None
+        
+        if classifier_key in cleaned_state_dict:
+            num_classes = cleaned_state_dict[classifier_key].shape[0]
+            print(f"Found classifier layer '{classifier_key}' with {num_classes} classes")
+        else:
+            # 如果找不到標準的分類器鍵，搜尋其他可能的分類器層
+            for key in cleaned_state_dict.keys():
+                if 'classifier' in key and 'weight' in key and len(cleaned_state_dict[key].shape) == 2:
+                    classifier_key = key
+                    num_classes = cleaned_state_dict[key].shape[0]
+                    print(f"Found classifier layer '{classifier_key}' with {num_classes} classes")
+                    break
+        
+        if num_classes is None:
+            raise ValueError("無法從模型權重中檢測到類別數")
+        
+        # 使用 torchvision ConvNeXt 架構
+        from torchvision import models
+        import torch.nn as nn
+        
+        model = models.convnext_base(weights=None)
+        
+        # 修改分類器層（ConvNeXt 的分類器在 index 2）
+        model.classifier[2] = nn.Linear(model.classifier[2].in_features, num_classes)
+        
+        # 載入權重（使用清理後的 state_dict）
+        missing_keys, unexpected_keys = model.load_state_dict(cleaned_state_dict, strict=False)
+        
+        if missing_keys:
+            print(f"Missing keys: {missing_keys[:5]}...")  # 只顯示前5個
+        if unexpected_keys:
+            print(f"Unexpected keys: {unexpected_keys[:5]}...")  # 只顯示前5個
+        
+        model.to(device)
+        model.eval()
+        
+        print("ConvNeXt model loaded successfully!")
+        return model
+        
+    except Exception as e:
+        print(f"Error loading ConvNeXt model: {str(e)}")
+        return None
+
+def load_vgg_model(model_name: str, model_path: str = None):
+    """
+    專門載入 VGG 模型的函數
+    使用標準的 torchvision VGG16 架構
+    """
+    if model_path is None:
+        model_path = f"./model/{model_name}.pth"
+    
+    if not os.path.exists(model_path):
+        print(f"❌ VGG 模型檔案不存在: {model_path}，使用模擬模式")
+        return None
+    
+    try:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # 載入檢查點
+        checkpoint = torch.load(model_path, map_location=device)
+        
+        # 提取 state_dict
+        if isinstance(checkpoint, dict):
+            if 'model_state_dict' in checkpoint:
+                state_dict = checkpoint['model_state_dict']
+            elif 'state_dict' in checkpoint:
+                state_dict = checkpoint['state_dict']
+            else:
+                state_dict = checkpoint
+        else:
+            state_dict = checkpoint.state_dict() if hasattr(checkpoint, 'state_dict') else checkpoint
+        
+        # 清理鍵名，去除可能的 module. 前綴
+        cleaned_state_dict = {}
+        for k, v in state_dict.items():
+            name = k.replace("module.", "") if k.startswith("module.") else k
+            cleaned_state_dict[name] = v
+        
+        # 從 classifier.6 層檢測類別數量
+        num_classes = 183  # 預設值
+        if 'classifier.6.weight' in cleaned_state_dict:
+            num_classes = cleaned_state_dict['classifier.6.weight'].shape[0]
+        elif 'classifier.6.out_features' in cleaned_state_dict:
+            num_classes = cleaned_state_dict['classifier.6.out_features']
+        
+        # 使用標準的 torchvision VGG16 架構
+        from torchvision import models
+        import torch.nn as nn
+        
+        model = models.vgg16(weights=None)  # 不載入預訓練權重
+        
+        # 修改最後的分類層以匹配類別數
+        model.classifier[6] = nn.Linear(4096, num_classes)
+        
+        model = model.to(device)
+        
+        # 載入模型權重
+        missing_keys, unexpected_keys = model.load_state_dict(cleaned_state_dict, strict=False)
+        
+        if missing_keys:
+            print(f"⚠️ VGG 缺失的鍵: {missing_keys[:5]}..." if len(missing_keys) > 5 else f"⚠️ VGG 缺失的鍵: {missing_keys}")
+        
+        if unexpected_keys:
+            print(f"⚠️ VGG 未預期的鍵: {unexpected_keys[:5]}..." if len(unexpected_keys) > 5 else f"⚠️ VGG 未預期的鍵: {unexpected_keys}")
+        
+        model.eval()
+        print(f"✅ 成功載入 VGG 模型: {model_name} (類別數: {num_classes})")
+        return model
+        
+    except Exception as e:
+        print(f"❌ 載入 VGG 模型失敗: {e}")
+        return None
 
