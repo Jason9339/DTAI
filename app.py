@@ -1920,16 +1920,37 @@ def build_main_app():
                             </div>
                         </div>
                     </div>
-                    """)
-            # 注意事項
+                    """)            # 注意事項
             with gr.Row():
                 with gr.Column(scale=1):
-                    gr.Markdown("""                    ### 重要聲明
-                    - 本系統僾供**健康參考**使用
-                    - **不能替代**專業醫療診斷
-                    - 如有健康問題請**諮詢醫師**
-                    - 建議結合**個人實際情況**調整
-                    """, elem_classes=["disclaimer-section"])
+                    gr.HTML("""
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="color: #4A6741; font-size: 1.6rem; margin-bottom: 15px;">⚠️ 重要聲明</h3>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #F0F7F0 0%, #F8FBF6 100%); 
+                                border: 2px solid rgba(106, 153, 78, 0.2); 
+                                border-radius: 15px; 
+                                padding: 25px; 
+                                color: #2D5016; 
+                                line-height: 1.6;
+                                font-size: 0.95rem;">
+                        <p style="margin: 0 0 15px 0;">
+                            <strong>關於AI分析：</strong><br>
+                            本系統使用先進的AI技術進行體質分析和食物辨識，提供個人化的中醫養生建議。
+                            所有分析結果僅供健康參考使用，建議結合個人實際情況調整。
+                        </p>
+                        <p style="margin: 0 0 15px 0;">
+                            <strong>關於中醫理論：</strong><br>
+                            體質分析和食物屬性基於傳統中醫理論整理，個人體質差異較大，
+                            建議諮詢專業中醫師獲得更準確的個人化建議。
+                        </p>
+                        <p style="margin: 0;">
+                            <strong>健康提醒：</strong><br>
+                            本系統不能替代專業醫療診斷和治療建議，如有健康問題或特殊體質，
+                            請務必諮詢合格的醫療專業人員。
+                        </p>
+                    </div>
+                    """)
           # 體質分析頁面
         with gr.Column(visible=False, elem_classes=["main-content", "constitution-analysis-container"]) as constitution_page:
             back_to_home_1 = gr.Button("返回主頁", elem_classes=["back-button"])

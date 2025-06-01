@@ -985,7 +985,7 @@ def build_food_recognition_page():
     .gradio-container .tab-nav button span,
     .gradio-container button[role="tab"] span {
         background-color: #F8FBF6 !important;
-        color: #000000 !important;
+        color: #FFFFFF !important;
         font-weight: 600 !important;
         border: 2px solid rgba(106, 153, 78, 0.2) !important;
         border-radius: 8px !important;
@@ -1002,7 +1002,7 @@ def build_food_recognition_page():
     .gradio-container .tab-nav button:hover span,
     .gradio-container button[role="tab"]:hover span {
         background-color: rgba(106, 153, 78, 0.1) !important;
-        color: #000000 !important;
+        color: #FFFFFF !important;
         border-color: rgba(106, 153, 78, 0.4) !important;
     }
     
@@ -1015,20 +1015,19 @@ def build_food_recognition_page():
     .gradio-container .tab-nav button.selected span,
     .gradio-container button[role="tab"][aria-selected="true"] span {
         background-color: #6A9A4E !important;
-        color: #000000 !important;
+        color: #FFFFFF !important;
         box-shadow: 0 4px 12px rgba(106, 153, 78, 0.3) !important;
-    }
-      /* 強制覆蓋所有可能的Tab文字顏色 */
+    }/* 強制覆蓋所有可能的Tab文字顏色 */
     .gradio-container [role="tablist"] button,
     .gradio-container [role="tablist"] button *,
     .gradio-container .tabs button,
     .gradio-container .tabs button *,
     .gradio-container div[role="tablist"] button,
     .gradio-container div[role="tablist"] button * {
-        color: #000000 !important;
+        color: #FFFFFF !important;
     }
     
-    /* 通用Tab按鈕強制黑色文字 */
+    /* 通用Tab按鈕強制白色文字 */
     .gradio-container button[role="tab"],
     .gradio-container button[role="tab"] *,
     .gradio-container [data-testid="tab"],
@@ -1037,14 +1036,13 @@ def build_food_recognition_page():
     .gradio-container .tab-nav button *,
     .gradio-container .gr-tab-nav button,
     .gradio-container .gr-tab-nav button * {
-        color: #000000 !important;
+        color: #FFFFFF !important;
         text-shadow: none !important;
-    }
-      /* 最強力的覆蓋 - 針對任何包含標籤emoji的按鈕 */
+    }      /* 最強力的覆蓋 - 針對任何包含標籤emoji的按鈕 */
     .gradio-container button:contains("🎯"),
     .gradio-container button:contains("📊"), 
     .gradio-container button:contains("🔍") {
-        color: #000000 !important;
+        color: #FFFFFF !important;
     }
     
     /* 終極Tab文字顏色修復 - 針對Gradio動態生成的元素 */
@@ -1058,16 +1056,26 @@ def build_food_recognition_page():
     .gradio-container .tab-item span,
     .gradio-container .tabitem,
     .gradio-container .tabitem span {
-        color: #000000 !important;
+        color: #FFFFFF !important;
     }
-    
-    /* 針對可能的白色文字覆蓋 */
+      /* 針對可能的深色文字覆蓋 */
     .gradio-container button:not([class*="food-recognition"]):not([class*="single-model"]) {
-        color: #000000 !important;
+        color: #FFFFFF !important;
     }
     
     .gradio-container button:not([class*="food-recognition"]):not([class*="single-model"]) span {
-        color: #000000 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* 特別針對Tab按鈕的強制白色文字 */
+    .gradio-container [role="tablist"] button[role="tab"],
+    .gradio-container [role="tablist"] button[role="tab"] *,
+    .gradio-container .tabs .tab-nav button,
+    .gradio-container .tabs .tab-nav button *,
+    .gradio-container .gr-tabs button,
+    .gradio-container .gr-tabs button * {
+        color: #FFFFFF !important;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
     }
     
     /* 結果顯示區域文字修復 */
