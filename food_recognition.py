@@ -803,27 +803,6 @@ def build_food_recognition_page():
         text-align: center !important;
     }
     
-    /* 快速結果顯示樣式 */
-    .quick-result-display {
-        background: linear-gradient(135deg, rgba(106, 153, 78, 0.08) 0%, rgba(212, 175, 55, 0.05) 100%) !important;
-        border: 2px solid rgba(106, 153, 78, 0.2) !important;
-        border-radius: 15px !important;
-        padding: 15px !important;
-        margin: 10px 0 !important;
-        font-size: 0.95rem !important;
-        line-height: 1.6 !important;
-        box-shadow: 0 4px 15px rgba(106, 153, 78, 0.1) !important;
-    }
-    
-    .quick-result-display textarea {
-        background: transparent !important;
-        border: none !important;
-        color: #2D5016 !important;
-        font-weight: 500 !important;
-        font-family: 'Microsoft YaHei', sans-serif !important;
-        resize: none !important;
-    }
-    
     /* 按鈕樣式 */
     .food-recognition-btn {
         background: linear-gradient(135deg, #6A9A4E 0%, #5A8A3E 100%) !important;
@@ -846,26 +825,7 @@ def build_food_recognition_page():
         background: linear-gradient(135deg, #5A8A3E 0%, #4A7A2E 100%) !important;
     }
     
-    .food-single-model-btn {
-        background: linear-gradient(135deg, #8B4513 0%, #7A3F12 100%) !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 12px 20px !important;
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3) !important;
-        margin: 8px 0 !important;
-        min-width: 200px !important;
-        cursor: pointer !important;
-    }
-    
-    .food-single-model-btn:hover {
-        transform: translateY(-3px) !important;
-        box-shadow: 0 12px 35px rgba(139, 69, 19, 0.4) !important;
-        background: linear-gradient(135deg, #7A3F12 0%, #6A2F02 100%) !important;
-    }    /* 漂浮返回按鈕樣式 - 使用 app.py 的統一樣式 */
+    /* 漂浮返回按鈕樣式 - 使用 app.py 的統一樣式 */
     
     /* 結果顯示區域 */
     .food-result-section {
@@ -1441,42 +1401,6 @@ def build_food_recognition_page():
     with gr.Column(elem_classes=["food-recognition-container"]):        # 添加CSS樣式
         gr.HTML(food_page_css)
         
-        # 添加輕量級的JavaScript修復
-        gr.HTML("""
-        <script>
-            // 下拉選單修復，確保正常互動
-            setTimeout(function() {
-                try {
-                    // 尋找模型選擇器下拉選單
-                    const modelDropdown = document.getElementById('model_selector');
-                    if (modelDropdown) {
-                        // 確保下拉選單是可互動的
-                        modelDropdown.style.pointerEvents = 'auto';
-                        modelDropdown.style.cursor = 'pointer';
-                        modelDropdown.style.zIndex = '1000';
-                        
-                        // 添加下拉選單的樣式類別
-                        modelDropdown.classList.add('model-dropdown');
-                        console.log('下拉選單修復已應用');
-                    }
-                    
-                    // 處理所有可能的下拉選單元素
-                    const allDropdowns = document.querySelectorAll('[data-testid="dropdown"], .gr-dropdown, select');
-                    allDropdowns.forEach(dropdown => {
-                        if (dropdown.id === 'model_selector' || dropdown.closest('#model_selector')) {
-                            dropdown.style.pointerEvents = 'auto';
-                            dropdown.style.cursor = 'pointer';
-                            dropdown.classList.add('model-dropdown');
-                        }
-                    });
-                    
-                } catch (e) {
-                    console.log('下拉選單修復失敗:', e);
-                }
-            }, 500);
-        </script>
-        """)
-        
         # 英雄區域 - 頁面標題和說明
         with gr.Column(elem_classes=["food-hero-section"]):
             gr.HTML("""
@@ -1528,26 +1452,12 @@ def build_food_recognition_page():
                     # 模型選擇區域
                     gr.HTML("""
                     <div style="background: rgba(106, 153, 78, 0.1); padding: 15px; border-radius: 10px; margin: 15px 0;">
-                        <h4 style="color: #4A6741; margin-bottom: 10px;">🤖 選擇AI模型</h4>
+                        <h4 style="color: #4A6741; margin-bottom: 10px;">🤖 AI模型說明</h4>
                         <p style="color: #6A9A4E; font-size: 0.9rem; margin: 0;">
-                            可選擇特定模型進行單獨辨識
+                            系統將自動使用多個AI模型進行綜合辨識，以提高準確性。
                         </p>
                     </div>
                     """)
-                    
-                    model_name_input = gr.Dropdown(
-                        choices=[
-                            "convnext_90", "densenet_86", "efficientnet_84", "resnet50_78",
-                            "swin_model_94", "swinv2_model_94", "vgg_model_78", "vit_model_74"
-                        ],
-                        value="swin_model_94",
-                        label="選擇模型",
-                        info="選擇要使用的AI模型進行食物辨識",
-                        container=True,
-                        interactive=True,
-                        elem_id="model_selector",
-                        elem_classes=["model-dropdown"]
-                    )
                     
                     # 辨識按鈕
                     recognize_all_btn = gr.Button(
@@ -1557,25 +1467,43 @@ def build_food_recognition_page():
                         size="lg"
                     )
                     
-                    single_model_btn = gr.Button(
-                        "🔍 單一模型辨識", 
-                        elem_classes=["food-single-model-btn"],
-                        variant="secondary",
-                        size="lg"
-                    )
-            
-            # 辨識結果顯示（在下方）
-            quick_result_display = gr.Textbox(
-                label="🎯 辨識結果",
-                value="請上傳圖片並點擊辨識按鈕開始AI辨識...",
-                interactive=False,
-                container=True,
-                elem_classes=["quick-result-display"],
-                lines=8,
-                max_lines=12,
-                visible=True
-            )
-          # 狀態顯示
+                    # single_model_btn = gr.Button(
+                    #     "🔍 單一模型辨識", 
+                    #     elem_classes=["food-single-model-btn"],
+                    #     variant="secondary",
+                    #     size="lg"
+                    # )
+
+            # 範例圖片選擇區域
+            with gr.Column(elem_classes=["food-upload-section"]):
+                gr.HTML("<h3>🖼️ 或選擇範例圖片試試看</h3>")
+                
+                with gr.Row():
+                    # 定義範例圖片信息
+                    sample_images = [
+                        {"name": "鮑魚", "file": "Abalone.jpg", "desc": "海鮮類"},
+                        {"name": "竹筍", "file": "Bambooshoot.jpg", "desc": "蔬菜類"},
+                        {"name": "玉米", "file": "Corn.jpg", "desc": "穀物類"},
+                        {"name": "毛豆", "file": "GreenSoybean.jpg", "desc": "豆類"},
+                        {"name": "蜂蜜", "file": "Honey.jpg", "desc": "甜品類"},
+                        {"name": "馬鈴薯", "file": "Potato.jpg", "desc": "根莖類"},
+                        {"name": "楊桃", "file": "Starfruit.jpg", "desc": "水果類"},
+                        {"name": "鴨梨", "file": "Yapear.jpg", "desc": "水果類"}
+                    ]
+                    
+                    # 創建範例圖片按鈕
+                    sample_buttons = []
+                    for i, img_info in enumerate(sample_images):
+                        with gr.Column(scale=1):
+                            btn = gr.Button(
+                                f"🍽️ {img_info['name']}\n({img_info['desc']})",
+                                elem_classes=["food-recognition-btn"],
+                                variant="secondary",
+                                size="sm"
+                            )
+                            sample_buttons.append((btn, img_info['file']))
+        
+        # 狀態顯示
         status_display = gr.Textbox(
             label="📊 辨識狀態",
             value="請上傳食物圖片開始辨識",
@@ -1626,22 +1554,22 @@ def build_food_recognition_page():
                         interactive=False
                     )
                 
-                with gr.TabItem("🔍 單一模型結果", elem_id="single_tab"):
-                    gr.HTML("""
-                    <div class="tab-description">
-                        <strong>🎯 指定模型辨識</strong><br>
-                        使用您在左側選擇的特定AI模型進行食物辨識，可比較不同模型的辨識能力和特點。
-                    </div>
-                    """)
-                    
-                    single_result_display = gr.Textbox(
-                        label="單一模型辨識結果",
-                        container=True,
-                        show_label=True,
-                        lines=15,                        max_lines=20,
-                        elem_classes=["json-holder", "recognition-container"],
-                        interactive=False
-                    )
+                # with gr.TabItem("🔍 單一模型結果", elem_id="single_tab"):
+                #     gr.HTML("""
+                #     <div class="tab-description">
+                #         <strong>🎯 指定模型辨識</strong><br>
+                #         使用您在左側選擇的特定AI模型進行食物辨識，可比較不同模型的辨識能力和特點。
+                #     </div>
+                #     """)
+                #     
+                #     single_result_display = gr.Textbox(
+                #         label="單一模型辨識結果",
+                #         container=True,
+                #         show_label=True,
+                #         lines=15,                        max_lines=20,
+                #         elem_classes=["json-holder", "recognition-container"],
+                #         interactive=False
+                #     )
         
         def format_comprehensive_result(result_dict):
             """格式化綜合辨識結果為可讀文本"""
@@ -1669,7 +1597,7 @@ def build_food_recognition_page():
             if not result_dict:
                 return "❌ 無詳細結果"
             
-            text = "📊 各模型詳細辨識結果\n"
+            text = "各模型詳細辨識結果\n"
             text += "=" * 40 + "\n\n"
             
             for model_key, result in result_dict.items():
@@ -1780,7 +1708,22 @@ def build_food_recognition_page():
                 return formatted_result, status
             except Exception as e:
                 error_text = f"❌ 辨識過程發生錯誤: {str(e)}"
-                return error_text, f"❌ {model_name} 辨識失敗: {str(e)}"        # 使用說明部分
+                return error_text, f"❌ {model_name} 辨識失敗: {str(e)}"
+
+        def load_sample_image(image_filename):
+            """載入範例圖片的函數"""
+            try:
+                image_path = f"./assets/images/{image_filename}"
+                if os.path.exists(image_path):
+                    from PIL import Image
+                    image = Image.open(image_path)
+                    return image, f"✅ 已載入範例圖片: {image_filename}"
+                else:
+                    return None, f"❌ 找不到範例圖片: {image_filename}"
+            except Exception as e:
+                return None, f"❌ 載入範例圖片失敗: {str(e)}"
+
+        # 使用說明部分
         with gr.Column(elem_classes=["food-result-section"]):
             gr.HTML("""
             <div style="text-align: center; margin-bottom: 30px;">
@@ -1852,7 +1795,7 @@ def build_food_recognition_page():
         # 創建一個可見的按鈕，並應用漂浮樣式
         # 這個按鈕的 click 事件會在 app.py 中被綁定
         back_to_home_btn = gr.Button(
-            "🏠",
+            "🏠 🔙",
             elem_classes=["floating-return-button"], # 應用漂浮按鈕的CSS class
             visible=True  # 設置為可見
         )
@@ -1867,17 +1810,26 @@ def build_food_recognition_page():
         )
         
         # 單一模型辨識按鈕事件
-        single_model_btn.click(
-            fn=update_single_result,
-            inputs=[food_image, model_name_input],
-            outputs=[single_result_display, status_display],
-            api_name="recognize_single_food_model",
-            show_progress=True
-        )
+        # single_model_btn.click(
+        #     fn=update_single_result,
+        #     inputs=[food_image, model_name_input],
+        #     outputs=[single_result_display, status_display],
+        #     api_name="recognize_single_food_model",
+        #     show_progress=True
+        # )
+        
+        # 範例圖片按鈕事件綁定
+        for btn, filename in sample_buttons:
+            btn.click(
+                fn=load_sample_image,
+                inputs=[gr.State(filename)],
+                outputs=[food_image, status_display],
+                show_progress=True
+            )
         
         # 返回主頁按鈕事件已在 app.py 中統一處理
     
-    return quick_result_display, food_state, back_to_home_btn
+    return None, food_state, back_to_home_btn
 
 def load_swin_model(model_name: str, model_path: str = None):
     """
