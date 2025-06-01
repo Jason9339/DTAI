@@ -865,39 +865,7 @@ def build_food_recognition_page():
         transform: translateY(-3px) !important;
         box-shadow: 0 12px 35px rgba(139, 69, 19, 0.4) !important;
         background: linear-gradient(135deg, #7A3F12 0%, #6A2F02 100%) !important;
-    }    /* 漂浮返回按鈕樣式 - 右上角 */
-    .floating-return-button {
-        position: fixed !important;
-        top: 20px !important;
-        right: 20px !important;
-        background: linear-gradient(135deg, #F0F8F0 0%, #E8F5E8 100%) !important;
-        color: #2D5016 !important;
-        border: 2px solid rgba(106, 153, 78, 0.3) !important;
-        border-radius: 25px !important;
-        padding: 12px 20px !important;
-        font-size: 1rem !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 4px 20px rgba(106, 153, 78, 0.15) !important;
-        z-index: 99999 !important;
-        cursor: pointer !important;
-        min-width: 120px !important;
-        height: 48px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        pointer-events: auto !important;
-        user-select: none !important;
-        font-family: 'Microsoft YaHei', sans-serif !important;
-    }
-    
-    .floating-return-button:hover {
-        transform: translateY(-2px) scale(1.05) !important;
-        box-shadow: 0 8px 30px rgba(106, 153, 78, 0.25) !important;
-        background: linear-gradient(135deg, #E8F5E8 0%, #D4F0D4 100%) !important;
-        border-color: rgba(106, 153, 78, 0.5) !important;
-        color: #1F3D0C !important;
-    }
+    }    /* 漂浮返回按鈕樣式 - 使用 app.py 的統一樣式 */
     
     /* 結果顯示區域 */
     .food-result-section {
@@ -969,6 +937,51 @@ def build_food_recognition_page():
         border: 2px solid rgba(106, 153, 78, 0.3) !important;
     }
     
+    /* 下拉選單修復 - 強化版 */
+    .gradio-container select,
+    .gradio-container .gr-dropdown,
+    .gradio-container .dropdown,
+    .gradio-container [data-testid="dropdown"],
+    .gradio-container .gradio-dropdown,
+    .gradio-container .gr-form .gr-dropdown,
+    .gradio-container .select-wrap,
+    .gradio-container .select-wrap select,
+    .gradio-container .gr-form select {
+        color: #2D5016 !important;
+        background-color: #FFFFFF !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        padding: 8px 12px !important;
+        height: auto !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+    
+    /* 下拉選單選項修復 */
+    .gradio-container .gr-dropdown option,
+    .gradio-container select option,
+    .gradio-container .select-wrap option,
+    .gradio-container .dropdown option,
+    .gradio-container [data-testid="dropdown"] option {
+        color: #2D5016 !important;
+        background-color: #FFFFFF !important;
+        font-size: 14px !important;
+        padding: 8px !important;
+    }
+    
+    /* 下拉選單互動狀態 */
+    .gradio-container .gr-dropdown:hover,
+    .gradio-container .gr-dropdown:focus,
+    .gradio-container .gr-dropdown:active,
+    .gradio-container select:hover,
+    .gradio-container select:focus,
+    .gradio-container select:active {
+        border-color: rgba(106, 153, 78, 0.6) !important;
+        box-shadow: 0 0 0 2px rgba(106, 153, 78, 0.2) !important;
+    }
+    
     /* 按鈕文字確保為白色 */
     .gradio-container button,
     .gradio-container button span,
@@ -984,7 +997,7 @@ def build_food_recognition_page():
     .gradio-container .gr-tab-nav button span,
     .gradio-container .tab-nav button span,
     .gradio-container button[role="tab"] span {
-        background-color: #F8FBF6 !important;
+        background-color: #466235 !important; /* 深綠色背景 */
         color: #FFFFFF !important;
         font-weight: 600 !important;
         border: 2px solid rgba(106, 153, 78, 0.2) !important;
@@ -992,6 +1005,7 @@ def build_food_recognition_page():
         margin: 2px !important;
         padding: 12px 16px !important;
         font-size: 14px !important;
+        transition: all 0.3s ease !important;
     }
     
     .gradio-container .tabitem button:hover,
@@ -1001,7 +1015,7 @@ def build_food_recognition_page():
     .gradio-container .tabitem button:hover span,
     .gradio-container .tab-nav button:hover span,
     .gradio-container button[role="tab"]:hover span {
-        background-color: rgba(106, 153, 78, 0.1) !important;
+        background-color: #3A522C !important; /* 更深的綠色 */
         color: #FFFFFF !important;
         border-color: rgba(106, 153, 78, 0.4) !important;
     }
@@ -1014,9 +1028,10 @@ def build_food_recognition_page():
     .gradio-container .tabitem button.selected span,
     .gradio-container .tab-nav button.selected span,
     .gradio-container button[role="tab"][aria-selected="true"] span {
-        background-color: #6A9A4E !important;
+        background-color: #2D4017 !important; /* 非常深的綠色 */
         color: #FFFFFF !important;
-        box-shadow: 0 4px 12px rgba(106, 153, 78, 0.3) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        border-color: #6A9A4E !important;
     }/* 強制覆蓋所有可能的Tab文字顏色 */
     .gradio-container [role="tablist"] button,
     .gradio-container [role="tablist"] button *,
@@ -1147,42 +1162,330 @@ def build_food_recognition_page():
             margin: 5px !important;
         }
     }
+    
+    /* 修復下拉選單 - 最新版Gradio兼容 */
+    div.gradio-dropdown {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background-color: white !important;
+        color: #2D5016 !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        border-radius: 8px !important;
+        position: relative !important;
+        z-index: 100 !important;
+        width: 100% !important;
+    }
+    
+    /* 強制顯示下拉選單的選項 */
+    div.gradio-dropdown > ul,
+    div.gradio-dropdown div[role="listbox"],
+    div.gradio-dropdown div[class*="list-container"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background-color: white !important;
+        color: #2D5016 !important;
+        border-radius: 8px !important;
+        z-index: 101 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* 下拉箭頭按鈕 */
+    div.gradio-dropdown button[aria-label="Show options"],
+    div.gradio-dropdown button[class*="arrow"] {
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #2D5016 !important;
+    }
+    
+    /* 下拉選單項目 */
+    div.gradio-dropdown li,
+    div.gradio-dropdown div[role="option"],
+    div.gradio-dropdown div[class*="item"] {
+        color: #2D5016 !important;
+        background-color: white !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* 下拉選單懸停效果 */
+    div.gradio-dropdown li:hover,
+    div.gradio-dropdown div[role="option"]:hover,
+    div.gradio-dropdown div[class*="item"]:hover {
+        background-color: rgba(106, 153, 78, 0.1) !important;
+    }
+    
+    /* 下拉選單已選中項目 */
+    div.gradio-dropdown li[aria-selected="true"],
+    div.gradio-dropdown div[role="option"][aria-selected="true"],
+    div.gradio-dropdown div[class*="item"][data-selected="true"] {
+        background-color: rgba(106, 153, 78, 0.2) !important;
+        font-weight: 600 !important;
+    }
+    
+    /* 下拉選單文字顏色 */
+    div.gradio-dropdown *,
+    div.gradio-dropdown span,
+    div.gradio-dropdown div,
+    div.gradio-dropdown p {
+        color: #2D5016 !important;
+    }
+
+    /* Gradio 5.x 版本下拉選單修復 */
+    .block.gr-box > div[class^="wrap"] select,
+    select.svelte-selector,
+    .gradio-dropdown,
+    [id^="component-"] select,
+    div[class*="dropdown"] select {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        z-index: 100 !important;
+        color: #2D5016 !important;
+        background-color: white !important;
+        border: 2px solid rgba(106, 153, 78, 0.3) !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: 40px !important;
+    }
+
+    /* Gradio 5.x 滑鼠懸停與焦點效果 */
+    .block.gr-box > div[class^="wrap"] select:hover,
+    select.svelte-selector:hover,
+    .gradio-dropdown:hover,
+    [id^="component-"] select:hover,
+    div[class*="dropdown"] select:hover,
+    .block.gr-box > div[class^="wrap"] select:focus,
+    select.svelte-selector:focus,
+    .gradio-dropdown:focus,
+    [id^="component-"] select:focus,
+    div[class*="dropdown"] select:focus {
+        border-color: rgba(106, 153, 78, 0.6) !important;
+        box-shadow: 0 0 0 2px rgba(106, 153, 78, 0.2) !important;
+        outline: none !important;
+    }
+
+    /* Gradio 5.x 選項樣式 */
+    .block.gr-box > div[class^="wrap"] select option,
+    select.svelte-selector option,
+    .gradio-dropdown option,
+    [id^="component-"] select option,
+    div[class*="dropdown"] select option {
+        color: #2D5016 !important;
+        background-color: white !important;
+        padding: 8px !important;
+        font-size: 14px !important;
+    }
+
+    /* 確保下拉選單點擊事件 */
+    .gradio-container {
+        --dropdown-background-color: white !important;
+        --dropdown-text-color: #2D5016 !important;
+        --dropdown-border-color: rgba(106, 153, 78, 0.3) !important;
+    }
+
+    /* 修復下拉選單的點擊和顯示問題 */
+    .gradio-container [data-testid="dropdown"],
+    .gradio-container [data-testid="dropdown"] *,
+    .gradio-container select,
+    .gradio-container .select-wrap,
+    .gradio-container .gr-dropdown {
+        pointer-events: auto !important;
+        user-select: auto !important;
+        -webkit-user-select: auto !important;
+        cursor: pointer !important;
+    }
+
+    /* 避免下拉選單被其他元素覆蓋 */
+    .gradio-container [data-testid="dropdown"]:focus,
+    .gradio-container [data-testid="dropdown"]:active,
+    .gradio-container select:focus,
+    .gradio-container select:active,
+    .gradio-container .select-wrap:focus,
+    .gradio-container .select-wrap:active {
+        z-index: 1000 !important;
+        position: relative !important;
+    }
+    
+    /* 強制顯示下拉箭頭 */
+    .gradio-container [data-testid="dropdown"] svg,
+    .gradio-container [data-testid="dropdown"] [data-testid="arrow"],
+    .gradio-container .select-wrap svg,
+    .gradio-container .select-wrap [data-testid="arrow"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #2D5016 !important;
+    }
+
+    /* 特定優化下拉選單樣式 */
+    #model_selector, 
+    div[id^="component-"] select,
+    .gr-dropdown[id="model_selector"] {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 45px !important;
+        background-color: white !important;
+        color: #2D5016 !important;
+        border: 2px solid #6A9A4E !important;
+        border-radius: 10px !important;
+        padding: 10px 15px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        box-shadow: 0 4px 10px rgba(106, 153, 78, 0.2) !important;
+        margin: 8px 0 !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        position: relative !important;
+        z-index: 50 !important;
+    }
+    
+    #model_selector:hover,
+    div[id^="component-"] select:hover,
+    .gr-dropdown[id="model_selector"]:hover {
+        border-color: #5A8A3E !important;
+        box-shadow: 0 6px 15px rgba(106, 153, 78, 0.3) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    #model_selector:focus,
+    div[id^="component-"] select:focus,
+    .gr-dropdown[id="model_selector"]:focus {
+        outline: none !important;
+        border-color: #4A7A2E !important;
+        box-shadow: 0 0 0 3px rgba(106, 153, 78, 0.3) !important;
+    }
+
+    /* 下拉選單樣式優化 */
+    .gradio-container .model-dropdown,
+    #model_selector,
+    .gradio-container #model_selector,
+    .gradio-container [data-testid="dropdown"],
+    .gr-dropdown[id="model_selector"] {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 45px !important;
+        background-color: white !important;
+        color: #2D5016 !important;
+        border: 2px solid #6A9A4E !important;
+        border-radius: 10px !important;
+        padding: 10px 15px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        box-shadow: 0 4px 10px rgba(106, 153, 78, 0.2) !important;
+        margin: 8px 0 !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        position: relative !important;
+        z-index: 50 !important;
+    }
+    
+    .gradio-container .model-dropdown:hover,
+    #model_selector:hover,
+    .gr-dropdown[id="model_selector"]:hover {
+        border-color: #5A8A3E !important;
+        box-shadow: 0 6px 15px rgba(106, 153, 78, 0.3) !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    .gradio-container .model-dropdown:focus,
+    #model_selector:focus,
+    .gr-dropdown[id="model_selector"]:focus {
+        outline: none !important;
+        border-color: #4A7A2E !important;
+        box-shadow: 0 0 0 3px rgba(106, 153, 78, 0.3) !important;
+    }
+
+    /* 下拉選單選項樣式 */
+    .gradio-container .model-dropdown .option,
+    #model_selector .option,
+    .gr-dropdown[id="model_selector"] .option {
+        color: #2D5016 !important;
+        background-color: white !important;
+        padding: 10px 15px !important;
+        border-bottom: 1px solid rgba(106, 153, 78, 0.1) !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .gradio-container .model-dropdown .option:hover,
+    #model_selector .option:hover,
+    .gr-dropdown[id="model_selector"] .option:hover {
+        background-color: rgba(106, 153, 78, 0.1) !important;
+        color: #2D5016 !important;
+    }
+    
+    .gradio-container .model-dropdown .option:selected,
+    .gradio-container .model-dropdown .option[aria-selected="true"],
+    #model_selector .option:selected,
+    .gr-dropdown[id="model_selector"] .option[aria-selected="true"] {
+        background-color: #6A9A4E !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+        box-sizing: border-box !important;
+    }
     </style>
     """
     
-    # 先添加漂浮按鈕到頁面
-    floating_button = gr.HTML("""
-    <div class="floating-return-button" onclick="alert('返回主頁功能')" title="返回主頁">
-        🏠 返回主頁
-    </div>
-    
-    <script>
-    // 確保漂浮按鈕始終在 body 的最後
-    setTimeout(function() {
-        var floatingBtn = document.querySelector('.floating-return-button');
-        if (floatingBtn && floatingBtn.parentNode !== document.body) {
-            document.body.appendChild(floatingBtn);
-            console.log('漂浮按鈕已移動到 body');
-        }
-    }, 1000);
-    
-    // 每3秒檢查一次
-    setInterval(function() {
-        var floatingBtn = document.querySelector('.floating-return-button');
-        if (floatingBtn && floatingBtn.parentNode !== document.body) {
-            document.body.appendChild(floatingBtn);
-        }
-    }, 3000);
-    </script>
-    """, visible=True)
+    # 不再需要額外的漂浮按鈕，使用 app.py 中的統一按鈕
     with gr.Column(elem_classes=["food-recognition-container"]):        # 添加CSS樣式
-        gr.HTML(food_page_css)# 英雄區域 - 頁面標題和說明
+        gr.HTML(food_page_css)
+        
+        # 添加輕量級的JavaScript修復
+        gr.HTML("""
+        <script>
+            // 下拉選單修復，確保正常互動
+            setTimeout(function() {
+                try {
+                    // 尋找模型選擇器下拉選單
+                    const modelDropdown = document.getElementById('model_selector');
+                    if (modelDropdown) {
+                        // 確保下拉選單是可互動的
+                        modelDropdown.style.pointerEvents = 'auto';
+                        modelDropdown.style.cursor = 'pointer';
+                        modelDropdown.style.zIndex = '1000';
+                        
+                        // 添加下拉選單的樣式類別
+                        modelDropdown.classList.add('model-dropdown');
+                        console.log('下拉選單修復已應用');
+                    }
+                    
+                    // 處理所有可能的下拉選單元素
+                    const allDropdowns = document.querySelectorAll('[data-testid="dropdown"], .gr-dropdown, select');
+                    allDropdowns.forEach(dropdown => {
+                        if (dropdown.id === 'model_selector' || dropdown.closest('#model_selector')) {
+                            dropdown.style.pointerEvents = 'auto';
+                            dropdown.style.cursor = 'pointer';
+                            dropdown.classList.add('model-dropdown');
+                        }
+                    });
+                    
+                } catch (e) {
+                    console.log('下拉選單修復失敗:', e);
+                }
+            }, 500);
+        </script>
+        """)
+        
+        # 英雄區域 - 頁面標題和說明
         with gr.Column(elem_classes=["food-hero-section"]):
             gr.HTML("""
-                <h1 class="food-page-title">🍎 AI食物辨識模組</h1>
-                <p class="food-page-subtitle">
-                    運用深度學習技術辨識食物，提供中醫五性屬性分析，助您了解食物的寒熱特性
-                </p>
+                <div style="margin-top: 40px;">
+                    <h1 class="food-page-title">AI食物辨識模組</h1>
+                    <p class="food-page-subtitle">
+                        運用深度學習技術辨識食物，提供中醫五性屬性分析，助您了解食物的寒熱特性
+                    </p>
+                </div>
             """)
         
         # 功能特色說明 - 使用卡片形式
@@ -1206,7 +1509,9 @@ def build_food_recognition_page():
                 <div class="food-feature-icon">🌡️</div>
                 <h4 class="food-feature-title">中醫屬性</h4>
                 <p class="food-feature-description">提供食物五性寒熱分析，融合傳統智慧</p>
-                """)        # 上傳區域
+                """)
+            
+            # 上傳區域
         with gr.Column(elem_classes=["food-upload-section"]):
             gr.HTML("<h3>📸 上傳食物圖片</h3>")
             
@@ -1237,7 +1542,11 @@ def build_food_recognition_page():
                         ],
                         value="swin_model_94",
                         label="選擇模型",
-                        container=True
+                        info="選擇要使用的AI模型進行食物辨識",
+                        container=True,
+                        interactive=True,
+                        elem_id="model_selector",
+                        elem_classes=["model-dropdown"]
                     )
                     
                     # 辨識按鈕
@@ -1339,17 +1648,17 @@ def build_food_recognition_page():
             if not result_dict or "錯誤" in result_dict:
                 return f"❌ 錯誤: {result_dict.get('錯誤', '未知錯誤')}"
             
-            text = "🎯 多模型綜合辨識結果\n"
+            text = "多模型綜合辨識結果\n"
             text += "=" * 40 + "\n\n"
             
-            text += f"🍎 最終辨識: {result_dict.get('最終辨識', 'N/A')}\n"
-            text += f"🌐 英文名: {result_dict.get('英文名', 'N/A')}\n"
-            text += f"🌡️ 五性屬性: {result_dict.get('五性屬性', 'N/A')}\n"
-            text += f"📊 模型共識度: {result_dict.get('模型共識度', 'N/A')}\n"
-            text += f"✅ 成功模型數: {result_dict.get('成功模型數', 'N/A')}\n\n"
+            text += f"最終辨識: {result_dict.get('最終辨識', 'N/A')}\n"
+            text += f"英文名: {result_dict.get('英文名', 'N/A')}\n"
+            text += f"五性屬性: {result_dict.get('五性屬性', 'N/A')}\n"
+            text += f"模型共識度: {result_dict.get('模型共識度', 'N/A')}\n"
+            text += f"成功模型數: {result_dict.get('成功模型數', 'N/A')}\n\n"
             
             if "投票分佈" in result_dict:
-                text += "📈 各食物得票分佈:\n"
+                text += "各食物得票分佈:\n"
                 for food, votes in result_dict["投票分佈"].items():
                     text += f"   • {food}: {votes} 票\n"
             
@@ -1371,10 +1680,10 @@ def build_food_recognition_page():
                     text += f"❌ 狀態: {result.get('狀態', '失敗')}\n"
                     text += f"💬 錯誤信息: {result.get('錯誤信息', '未知錯誤')}\n"
                 else:
-                    text += f"🍎 辨識食物: {result.get('辨識食物', 'N/A')}\n"
-                    text += f"🌐 英文名: {result.get('英文名', 'N/A')}\n"
-                    text += f"🌡️ 五性屬性: {result.get('五性屬性', 'N/A')}\n"
-                    text += f"📈 信心度: {result.get('信心度', 'N/A')}\n"
+                    text += f"辨識食物: {result.get('辨識食物', 'N/A')}\n"
+                    text += f"英文名: {result.get('英文名', 'N/A')}\n"
+                    text += f"五性屬性: {result.get('五性屬性', 'N/A')}\n"
+                    text += f"信心度: {result.get('信心度', 'N/A')}\n"
                 
                 text += "\n"
             
@@ -1387,12 +1696,12 @@ def build_food_recognition_page():
             text = "🔍 單一模型辨識結果\n"
             text += "=" * 40 + "\n\n"
             
-            text += f"🍎 辨識食物: {result_dict.get('辨識食物', 'N/A')}\n"
-            text += f"🌐 英文名: {result_dict.get('英文名', 'N/A')}\n"
-            text += f"🌡️ 五性屬性: {result_dict.get('五性屬性', 'N/A')}\n"
-            text += f"🤖 使用模型: {result_dict.get('使用模型', 'N/A')}\n"
-            text += f"📈 信心度: {result_dict.get('信心度', 'N/A')}\n"
-            text += f"🔧 運行模式: {result_dict.get('模式', 'N/A')}\n"
+            text += f"辨識食物: {result_dict.get('辨識食物', 'N/A')}\n"
+            text += f"英文名: {result_dict.get('英文名', 'N/A')}\n"
+            text += f"五性屬性: {result_dict.get('五性屬性', 'N/A')}\n"
+            text += f"使用模型: {result_dict.get('使用模型', 'N/A')}\n"
+            text += f"信心度: {result_dict.get('信心度', 'N/A')}\n"
+            text += f"運行模式: {result_dict.get('模式', 'N/A')}\n"
             
             return text
 
@@ -1410,12 +1719,12 @@ def build_food_recognition_page():
                     if "錯誤" in comprehensive:
                         return f"❌ 辨識失敗: {comprehensive.get('錯誤', '未知錯誤')}", "⚠️ 多模型辨識失敗"
                     
-                    quick_text = f"🍎 食物: {comprehensive.get('最終辨識', 'N/A')}\n"
-                    quick_text += f"🌐 英文名: {comprehensive.get('英文名', 'N/A')}\n"
-                    quick_text += f"🌡️ 五性: {comprehensive.get('五性屬性', 'N/A')}\n"
-                    quick_text += f"📊 模型共識度: {comprehensive.get('模型共識度', 'N/A')}\n"
-                    quick_text += f"✅ 成功模型數: {comprehensive.get('成功模型數', 'N/A')}\n"
-                    quick_text += "📋 詳細結果請查看下方分頁"
+                    quick_text = f"食物: {comprehensive.get('最終辨識', 'N/A')}\n"
+                    quick_text += f"英文名: {comprehensive.get('英文名', 'N/A')}\n"
+                    quick_text += f"五性: {comprehensive.get('五性屬性', 'N/A')}\n"
+                    quick_text += f"模型共識度: {comprehensive.get('模型共識度', 'N/A')}\n"
+                    quick_text += f"成功模型數: {comprehensive.get('成功模型數', 'N/A')}\n"
+                    quick_text += "詳細結果請查看下方分頁"
                     
                     status = "✅ 多模型綜合辨識完成！"
                 else:
@@ -1425,12 +1734,12 @@ def build_food_recognition_page():
                     if "錯誤" in result:
                         return f"❌ 辨識失敗: {result.get('錯誤', '未知錯誤')}", "⚠️ 辨識遇到問題"
                     
-                    quick_text = f"🍎 食物: {result.get('辨識食物', 'N/A')}\n"
-                    quick_text += f"🌐 英文名: {result.get('英文名', 'N/A')}\n"
-                    quick_text += f"🌡️ 五性: {result.get('五性屬性', 'N/A')}\n"
-                    quick_text += f"🤖 使用模型: {result.get('使用模型', 'N/A')}\n"
-                    quick_text += f"📈 信心度: {result.get('信心度', 'N/A')}\n"
-                    quick_text += f"🔧 運行模式: {result.get('模式', 'N/A')}"
+                    quick_text = f"食物: {result.get('辨識食物', 'N/A')}\n"
+                    quick_text += f"英文名: {result.get('英文名', 'N/A')}\n"
+                    quick_text += f"五性: {result.get('五性屬性', 'N/A')}\n"
+                    quick_text += f"使用模型: {result.get('使用模型', 'N/A')}\n"
+                    quick_text += f"信心度: {result.get('信心度', 'N/A')}\n"
+                    quick_text += f"運行模式: {result.get('模式', 'N/A')}"
                     
                     status = f"✅ 使用 {model_name or 'swin_model_94'} 辨識完成！"
                 
@@ -1540,10 +1849,12 @@ def build_food_recognition_page():
             
         food_state = gr.State()
         
-        # 創建一個隱藏的按鈕用於事件綁定
+        # 創建一個可見的按鈕，並應用漂浮樣式
+        # 這個按鈕的 click 事件會在 app.py 中被綁定
         back_to_home_btn = gr.Button(
-            "返回主頁",
-            visible=False
+            "🏠",
+            elem_classes=["floating-return-button"], # 應用漂浮按鈕的CSS class
+            visible=True  # 設置為可見
         )
         
         # 多模型綜合辨識按鈕事件
@@ -1564,23 +1875,7 @@ def build_food_recognition_page():
             show_progress=True
         )
         
-        # 返回主頁按鈕事件
-        back_to_home_btn.click(
-            fn=lambda: (gr.update(visible=True), gr.update(visible=False)),
-            inputs=[],
-            outputs=[floating_button, back_to_home_btn],
-            api_name="back_to_home",
-            show_progress=False
-        )
-        
-        # 隱藏返回主頁按鈕
-        floating_button.click(
-            fn=lambda: gr.update(visible=False),
-            inputs=[],
-            outputs=[floating_button],
-            api_name="hide_floating_button",
-            show_progress=False
-        )
+        # 返回主頁按鈕事件已在 app.py 中統一處理
     
     return quick_result_display, food_state, back_to_home_btn
 

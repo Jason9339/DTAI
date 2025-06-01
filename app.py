@@ -887,21 +887,59 @@ def build_main_app():
         }
           /* 返回按鈕 */
         .back-button {
-            background: #6b7280 !重要;
-            color: white !重要;
-            border: none !重要;
-            border-radius: 10px !重要;
-            padding: 12px 24px !重要;
-            margin-bottom: 30px !重要;
-            font-size: 1rem !重要;
-            font-weight: 500 !重要;
-            transition: all 0.3s ease !重要;
+            background: #6b7280 !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 12px 24px !important;
+            margin-bottom: 30px !important;
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+            transition: all 0.3s ease !important;
         }
         
         .back-button:hover {
-            transform: translateY(-2px) !重要;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !重要;
-        }        /* 頁面標題 */
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* 漂浮返回按鈕樣式 - 簡化版 */
+        .floating-return-button {
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+            background: white !important;
+            color: black !important;
+            border: 2px solid #6A9A4E !important;
+            border-radius: 50px !important; /* 完全圓角 */
+            padding: 8px 16px !important;
+            font-size: 0.9rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+            z-index: 10000 !important;
+            cursor: pointer !important;
+            width: auto !important;
+            height: auto !important;
+            min-width: 100px !important;
+            max-width: 150px !important;
+            line-height: normal !important;
+            text-align: center !important;
+        }
+        
+        /* 確保頁面標題與按鈕不重疊 */
+        .page-title, h1.page-title, .gr-markdown h1 {
+            padding-top: 40px !important; /* 為頂部按鈕留出空間 */
+            margin-top: 20px !important;
+        }
+        
+        .floating-return-button:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+            background: #F8FBF6 !important;
+        }
+        
+        /* 為了避免樣式衝突，這裡的樣式已移到 JavaScript 中動態添加 */        /* 頁面標題 */
         .page-title {
             color: #6A9A4E !important;
             font-size: 2.8rem !important;
@@ -1634,8 +1672,138 @@ def build_main_app():
         }
         </style>
           <script>
-        // 強化版 JavaScript 來處理 CheckboxGroup 的選中狀態視覺效果
+        // 超強力版返回按鈕文字修復 - 完全取代按鈕內容
         document.addEventListener('DOMContentLoaded', function() {
+            // 強制修復按鈕文字顏色 - 完全取代按鈕內容
+            function fixReturnButtonColor() {
+                const buttons = document.querySelectorAll('.floating-return-button');
+                
+                buttons.forEach(button => {
+                    // 1. 設置按鈕本身樣式
+                    button.style.setProperty('color', 'black', 'important');
+                    button.style.setProperty('background', 'white', 'important');
+                    button.style.setProperty('border', '2px solid #6A9A4E', 'important');
+                    button.style.setProperty('text-shadow', 'none', 'important');
+                    button.style.setProperty('display', 'inline-flex', 'important');
+                    button.style.setProperty('align-items', 'center', 'important');
+                    button.style.setProperty('justify-content', 'center', 'important');
+                    
+                    // 2. 完全取代按鈕內容 - 最直接的方法
+                    const originalText = button.textContent || "返回主頁";
+                    button.innerHTML = "";
+                    
+                    // 創建一個新的元素，避免樣式繼承問題
+                    const newContent = document.createElement('div');
+                    newContent.style.cssText = `
+                        color: black !important;
+                        font-weight: bold !important;
+                        text-shadow: none !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        font-size: 14px !important;
+                        letter-spacing: 0.5px !important;
+                        pointer-events: none !important;
+                    `;
+                    newContent.innerHTML = "🏠";
+                    button.appendChild(newContent);
+                    
+                    // 3. 添加一個透明的覆蓋層，以確保點擊事件仍然有效
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        z-index: 2;
+                        cursor: pointer;
+                    `;
+                    button.appendChild(overlay);
+                });
+            }
+            
+            // 添加專用按鈕重置樣式表
+            const style = document.createElement('style');
+            style.textContent = `
+                /* 超強力按鈕重置 - 完全覆蓋所有可能的按鈕樣式 */
+                .floating-return-button,
+                button.floating-return-button,
+                .gr-button.floating-return-button {
+                    position: fixed !important;
+                    top: 20px !important;
+                    right: 20px !important;
+                    background: white !important;
+                    background-color: white !important;
+                    background-image: none !important;
+                    color: black !important;
+                    border: 2px solid #6A9A4E !important;
+                    border-radius: 50px !important;
+                    padding: 8px 16px !important;
+                    font-size: 14px !important;
+                    font-weight: 600 !important;
+                    transition: all 0.3s ease !important;
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+                    z-index: 10000 !important;
+                    cursor: pointer !important;
+                    min-width: 100px !important;
+                    max-width: 150px !important;
+                    height: auto !important;
+                    min-height: 36px !important;
+                    line-height: normal !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    text-align: center !important;
+                    position: relative !important;
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+                }
+                
+                /* 強制所有子元素為黑色文字 */
+                .floating-return-button *,
+                button.floating-return-button *,
+                .gr-button.floating-return-button * {
+                    color: black !important;
+                    background: transparent !important;
+                    text-shadow: none !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                }
+                
+                /* 專門處理 SVG 圖標，確保它們顯示正確 */
+                .floating-return-button svg,
+                button.floating-return-button svg,
+                .gr-button.floating-return-button svg {
+                    fill: black !important;
+                    stroke: black !important;
+                }
+                
+                /* 專門處理 Gradio 按鈕中的特定元素 */
+                .floating-return-button .wrap,
+                button.floating-return-button .wrap,
+                .gr-button.floating-return-button .wrap,
+                .floating-return-button [class*="svelte"],
+                button.floating-return-button [class*="svelte"],
+                .gr-button.floating-return-button [class*="svelte"] {
+                    color: black !important;
+                    background: transparent !important;
+                    text-shadow: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // 增加執行次數，確保樣式完全生效
+            setTimeout(fixReturnButtonColor, 100);
+            setTimeout(fixReturnButtonColor, 500);
+            setTimeout(fixReturnButtonColor, 1000);
+            setTimeout(fixReturnButtonColor, 2000);
+            setTimeout(fixReturnButtonColor, 3000);
+            
+            // 每0.5秒執行一次確保持續生效
+            setInterval(fixReturnButtonColor, 500);
+            
+            console.log('返回按鈕文字顏色強力修復腳本已啟用');
+            
+            // 強化版 JavaScript 來處理 CheckboxGroup 的選中狀態視覺效果
             console.log('CheckboxGroup 樣式腳本已載入');
             
             // 更強力的選中狀態處理函數
@@ -1953,12 +2121,12 @@ def build_main_app():
                     """)
           # 體質分析頁面
         with gr.Column(visible=False, elem_classes=["main-content", "constitution-analysis-container"]) as constitution_page:
-            back_to_home_1 = gr.Button("返回主頁", elem_classes=["back-button"])
+            back_to_home_1 = gr.Button("🏠", elem_classes=["floating-return-button"])
             
             # 頁面標題區域 - 減少下邊距
             gr.HTML("""
             <div class="constitution-hero-section" style="margin-bottom: 10px;">
-                <h1 class="page-title">🏥 中醫體質分析</h1>
+                <h1 class="page-title">中醫體質分析</h1>
                 <p class="page-subtitle">透過專業的中醫問卷，AI將精準分析您的體質類型並提供個人化建議</p>
             </div>
             """)
@@ -1987,8 +2155,15 @@ def build_main_app():
         
         # 養生建議頁面
         with gr.Column(visible=False, elem_classes=["main-content"]) as advice_page:
-            back_to_home_3 = gr.Button("返回主頁", elem_classes=["back-button"])
-            gr.Markdown("# 個人化養生建議", elem_classes=["page-title"])
+            back_to_home_3 = gr.Button("🏠", elem_classes=["floating-return-button"])
+            
+            # 添加統一的頁面標題區域
+            gr.HTML("""
+            <div class="constitution-hero-section" style="margin-bottom: 10px; margin-top: 40px;">
+                <h1 class="page-title">🌿 個人化養生建議</h1>
+                <p class="page-subtitle">基於您的體質分析和食物辨識結果，AI將生成專屬的中醫養生建議</p>
+            </div>
+            """)
             
             build_health_advice_page(constitution_result_state, food_result_state)        
         # 頁面切換函數
@@ -2095,13 +2270,18 @@ def build_main_app():
 # 啟動應用
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='啟動中醫食物寒熱辨識與體質分析系統')
+    parser.add_argument('--server_port', type=int, default=7861, help='服務器端口')
+    args = parser.parse_args()
+    
     app = build_main_app()
     print("🚀 應用啟動中...")
     print("📝 提示：請手動在瀏覽器中打開下方 URL")
     app.launch(
         share=True,
         server_name="127.0.0.1",
-        server_port=7861,
+        server_port=args.server_port,
         show_error=True,
         favicon_path=None,
         ssl_verify=False,
