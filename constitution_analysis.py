@@ -130,7 +130,7 @@ def format_constitution_result(result: Dict) -> tuple:
 <div style="background: #FFFFFF; padding: 20px; border-radius: 25px; border: 1px solid rgba(106, 153, 78, 0.2); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);">
     <div style="background: linear-gradient(135deg, #6A9A4E 0%, #8FBC8F 100%); color: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(106, 154, 78, 0.3);">
         <div style="font-size: 2.2rem; font-weight: 700; margin-bottom: 15px;">
-            🎯 您的體質類型
+             您的體質類型
         </div>
         <div style="font-size: 2rem; font-weight: 600; margin-bottom: 10px;">
             {main_constitution}
@@ -147,7 +147,7 @@ def format_constitution_result(result: Dict) -> tuple:
 <div style="background: #FFFFFF; padding: 20px; border-radius: 25px; border: 1px solid rgba(106, 153, 78, 0.2); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);">
     <div style="background: linear-gradient(135deg, #6A9A4E 0%, #8FBC8F 100%); color: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(106, 154, 78, 0.3);">
         <div style="font-size: 2.2rem; font-weight: 700; margin-bottom: 15px;">
-            🎯 您的體質分析結果
+            您的體質分析結果
         </div>
         <div style="font-size: 1.8rem; font-weight: 600;">
             {main_constitution}
@@ -163,7 +163,7 @@ def format_constitution_result(result: Dict) -> tuple:
         content_sections.append(f"""
 <div style="background: #FFFFFF; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #6A9A4E; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
     <h3 style="color: #4A6741; font-size: 1.4rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center;">
-        <span style="background: #6A9A4E; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;">📄</span>
+        <span style="background: #6A9A4E; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;"></span>
         體質描述
     </h3>
     <div style="color: #1e293b; line-height: 1.7; font-size: 1.05rem;">
@@ -176,7 +176,7 @@ def format_constitution_result(result: Dict) -> tuple:
         content_sections.append(f"""
 <div style="background: #FFFFFF; padding: 25px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid #8FBC8F; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);">
     <h3 style="color: #4A6741; font-size: 1.4rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center;">
-        <span style="background: #8FBC8F; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;">🔍</span>
+        <span style="background: #8FBC8F; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;"></span>
         分析理由
     </h3>
     <div style="color: #1e293b; line-height: 1.7; font-size: 1.05rem;">
@@ -189,7 +189,7 @@ def format_constitution_result(result: Dict) -> tuple:
         content_sections.append(f"""
 <div style="background: linear-gradient(135deg, #F0F8F0 0%, #FFFFFF 100%); padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 2px solid rgba(106, 153, 78, 0.2); box-shadow: 0 6px 20px rgba(106, 153, 78, 0.1);">
     <h3 style="color: #4A6741; font-size: 1.4rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center;">
-        <span style="background: linear-gradient(135deg, #D4AF37 0%, #F9A826 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;">💡</span>
+        <span style="background: linear-gradient(135deg, #D4AF37 0%, #F9A826 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;"></span>
         養生建議
     </h3>
     <div style="color: #1e293b; line-height: 1.7; font-size: 1.05rem; background: #FFFFFF; padding: 20px; border-radius: 12px; border: 1px solid rgba(106, 153, 78, 0.1);">
@@ -202,7 +202,7 @@ def format_constitution_result(result: Dict) -> tuple:
         content_sections.append(f"""
 <div style="background: linear-gradient(135deg, #FFF8F5 0%, #FFFFFF 100%); padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 2px solid rgba(239, 68, 68, 0.2); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.1);">
     <h3 style="color: #DC2626; font-size: 1.4rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center;">
-        <span style="background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;">⚠️</span>
+        <span style="background: linear-gradient(135deg, #EF4444 0%, #F87171 100%); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 1.1rem;"></span>
         注意事項
     </h3>
     <div style="color: #1e293b; line-height: 1.7; font-size: 1.05rem; background: #FFFFFF; padding: 20px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.1);">
@@ -216,7 +216,7 @@ def format_constitution_result(result: Dict) -> tuple:
         content_sections.append(f"""
 <div style="background: #F8FAFC; padding: 20px; border-radius: 12px; text-align: center; margin-top: 25px; border: 1px solid #E2E8F0;">
     <div style="color: #64748B; font-size: 0.95rem; font-weight: 500;">
-        <span style="margin-right: 8px;">⏰</span>
+        <span style="margin-right: 8px;"></span>
         分析完成時間：{result['分析時間']}
     </div>
 </div>
@@ -875,7 +875,7 @@ def build_constitution_analysis_page():
         # 問卷標題區域
         gr.HTML("""
         <div class="questionnaire-header">
-            <h2>🏥 中醫體質問卷調查</h2>
+            <h2>中醫體質問卷調查</h2>
             <p>請根據您最近三個月的實際情況認真作答<br>
             問卷共20題，包含15道選擇題和5道簡答題，完成後AI將為您精準分析體質類型</p>
     </div>
@@ -887,7 +887,7 @@ def build_constitution_analysis_page():
         # 選擇題區域
         gr.HTML("""
         <div class="questionnaire-group-title">
-            <span class="group-icon">🔍</span>
+            <span class="group-icon"></span>
             選擇題部分（第1-15題）
             <div class="group-description">請根據您的實際情況選擇最符合的選項，可多選</div>
         </div>
@@ -907,7 +907,7 @@ def build_constitution_analysis_page():
         # 簡答題區域
         gr.HTML("""
         <div class="questionnaire-group-title">
-            <span class="group-icon">✍️</span>
+            <span class="group-icon"></span>
             簡答題部分（第16-20題）
             <div class="group-description">請根據您的實際情況簡要描述，有助於更精準的分析</div>
         </div>
@@ -937,7 +937,7 @@ def build_constitution_analysis_page():
         with gr.Column(visible=False, elem_classes=["constitution-result-section"]) as result_row:
             gr.HTML("""
             <div class="result-header">
-                <h2>🎯 您的體質分析結果</h2>
+                <h2>您的體質分析結果</h2>
             </div>
             """)
             

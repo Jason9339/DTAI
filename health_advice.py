@@ -284,15 +284,15 @@ def build_health_advice_page(constitution_result_state, food_result_state):
         # 添加自定義CSS樣式
         gr.HTML(ADVICE_PAGE_CSS)
         
-        # 頁面標題區域
-        gr.HTML("""
-        <div class="main-content">
-            <div class="hero-section">
-                <h1 class="page-title">🌿 個人化養生建議</h1>
-                <p class="page-subtitle">基於您的體質分析和食物辨識結果，AI將生成專屬的中醫養生建議</p>
-            </div>
-        </div>
-        """)
+        # 移除被漂浮按鈕遮擋的頁面標題區域
+        # gr.HTML("""
+        # <div class="main-content">
+        #     <div class="hero-section">
+        #         <h1 class="page-title">🌿 個人化養生建議</h1>
+        #         <p class="page-subtitle">基於您的體質分析和食物辨識結果，AI將生成專屬的中醫養生建議</p>
+        #     </div>
+        # </div>
+        # """)
         
         # 功能說明區域
         with gr.Row():
