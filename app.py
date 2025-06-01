@@ -697,6 +697,39 @@ def build_main_app():
         button span, .gr-button span {
             color: white !important;
         }
+        
+        /* 特別強化 analyze-button 的文字顏色 */
+        .analyze-button,
+        .analyze-button *,
+        .gr-button.analyze-button,
+        .gr-button.analyze-button *,
+        button.analyze-button,
+        button.analyze-button *,
+        [class*="analyze-button"],
+        [class*="analyze-button"] * {
+            color: white !important;
+            text-shadow: none !important;
+        }
+        
+        /* 超強化 - 針對primary按鈕和svelte動態class */
+        button.lg.primary.analyze-button,
+        button.primary.analyze-button,
+        button.analyze-button.primary,
+        button[class*="svelte"][class*="analyze-button"],
+        .gr-button.primary.analyze-button,
+        .primary.analyze-button,
+        .analyze-button.primary,
+        button.lg.primary.analyze-button *,
+        button.primary.analyze-button *,
+        button.analyze-button.primary *,
+        button[class*="svelte"][class*="analyze-button"] *,
+        .gr-button.primary.analyze-button *,
+        .primary.analyze-button *,
+        .analyze-button.primary * {
+            color: white !important;
+            background-color: #2D3748 !important;
+            text-shadow: none !important;
+        }
           /* 工作流程區域 */
         .workflow-row {
             margin: 30px 0 !重要;
@@ -1162,28 +1195,6 @@ def build_main_app():
         .gr-textbox textarea::placeholder,
         .gr-textbox input::placeholder {
             color: #9CA3AF !important;
-        }
-          /* 分析按鈕 */
-        .analyze-button {
-            background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 15px !important;
-            padding: 15px 40px !important;
-            font-size: 1.2rem !important;
-            font-weight: 600 !important;
-            margin: 30px auto !important;
-            display: block !important;
-            box-shadow: 0 8px 25px rgba(45, 55, 72, 0.3) !important;
-            transition: all 0.3s ease !important;
-            text-transform: none !important;
-            min-width: 200px !important;
-        }
-        
-        .analyze-button:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 12px 35px rgba(45, 55, 72, 0.4) !important;
-            background: linear-gradient(135deg, #1A202C 0%, #0F1419 100%) !important;
         }
         
         /* 結果顯示區域 */
@@ -1822,7 +1833,7 @@ def build_main_app():
                     gr.Markdown("""                    <div class="feature-card-content">
                     <div class="feature-icon">🔍</div>
                     <h3 class="feature-title">智慧體質分析</h3>
-                    <p class="feature-description">基於中醫理論的20題問卷調查，AI精準分析您的體質類型</p>
+                    <p class="feature-description">AI精準分析您的中醫體質類型</p>
                     </div>
                     """)
                     
@@ -1920,12 +1931,12 @@ def build_main_app():
                     - 建議結合**個人實際情況**調整
                     """, elem_classes=["disclaimer-section"])
           # 體質分析頁面
-        with gr.Column(visible=False, elem_classes=["main-content"]) as constitution_page:
+        with gr.Column(visible=False, elem_classes=["main-content", "constitution-analysis-container"]) as constitution_page:
             back_to_home_1 = gr.Button("返回主頁", elem_classes=["back-button"])
             
-            # 頁面標題區域
+            # 頁面標題區域 - 減少下邊距
             gr.HTML("""
-            <div class="constitution-hero-section">
+            <div class="constitution-hero-section" style="margin-bottom: 10px;">
                 <h1 class="page-title">🏥 中醫體質分析</h1>
                 <p class="page-subtitle">透過專業的中醫問卷，AI將精準分析您的體質類型並提供個人化建議</p>
             </div>
@@ -2064,6 +2075,8 @@ def build_main_app():
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
     app = build_main_app()
+    print("🚀 應用啟動中...")
+    print("📝 提示：請手動在瀏覽器中打開下方 URL")
     app.launch(
         share=True,
         server_name="127.0.0.1",
@@ -2071,5 +2084,5 @@ if __name__ == "__main__":
         show_error=True,
         favicon_path=None,
         ssl_verify=False,
-        inbrowser=True
+        inbrowser=False  # 設為 False 避免自動打開瀏覽器
     )
