@@ -8,7 +8,7 @@ cd model
 
 # Convnext model
 echo "下載 ConvNeXt 模型..."
-wget -O convnext_89.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/EXiXkxQc4TtJuyvFpCKZXoQBLEQU__vp2oCmfcIfDAhUpQ?download=1'
+wget -O convnext_90.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/Efu2Ymy6sPtErzeij1LrwJ0BnGeWPz-wQj2StVvXwsyldQ?download=1'
 
 # densenet model
 echo "下載 DenseNet 模型..."
@@ -20,7 +20,7 @@ wget -O resnet50_78.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/1117
 
 # vit model
 echo "下載 ViT 模型..."
-wget -O vit_model_89.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/EcFwAZiJdGVIgNPn5oXTpm8BtCrjVN_mQJCV9ozrlIbEWw?download=1'
+wget -O vit_model_74.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/EXcNR_cTrP5Ci9B2vJQCwpYBxgppkfBQQQVr7_FE23UMoQ?download=1'
 
 # swin model
 echo "下載 Swin Transformer 模型..."
@@ -29,6 +29,12 @@ wget -O swin_model_94.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/11
 # swinv2 model (注意：原始連結中有拼寫錯誤，已修正)
 echo "下載 SwinV2 Transformer 模型..."
 wget -O swinv2_model_94.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/EdIcKZ79utxFq_wDNWnp9BIBfAfcsv_-b6Ucs7zSe-iF0w?download=1'
+
+# efficientnet model
+wget -O efficientnet_84.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/EXzbadlYwDFHlbChnFATNiAB6DG2srzmqVn3hV5ETs5QIQ?download=1'
+
+# vgg model
+wget -O vgg_model_78.pth 'https://mail3nccu-my.sharepoint.com/:u:/g/personal/111703037_mail3_nccu_tw/Ef2A-cxdpw1Jm8Y7JrVEocMBZHQeKIW6wZbcDVC8pTlQDw?download=1'
 
 echo "所有模型下載完成！"
 echo "模型檔案列表："
