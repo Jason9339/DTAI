@@ -105,7 +105,7 @@ CONSTITUTION_INFO = {
     "氣鬱體質": {
         "alias": "思霧使徒",
         "nickname": "鬱悶派",
-        "image_path": "assets/images/血虛體質.png",
+        "image_path": "assets/images/氣鬱體質.png",
         "description": "氣機鬱滯，神情抑鬱"
     },
     "特稟體質": {
