@@ -1269,14 +1269,15 @@ def build_constitution_analysis_page():
             # 格式化結果
             image_path, title_text, details_text = format_constitution_result(result)
             
-            # 直接返回5個值，不要放在列表中
+            # 直接返回6個值，包括 constitution_state 的更新
             if image_path and os.path.exists(image_path):
                 return (
                     gr.update(value=image_path, visible=True),  # constitution_image
                     gr.update(value=title_text, visible=True),  # constitution_title
                     gr.update(value=details_text, visible=True),  # constitution_details
                     gr.update(visible=True),  # result_row
-                    result  # constitution_result_display
+                    result,  # constitution_result_display
+                    result   # constitution_state - 將分析結果存儲到狀態中
                 )
             else:
                 return (
@@ -1284,7 +1285,8 @@ def build_constitution_analysis_page():
                     gr.update(value=title_text, visible=True),  # constitution_title
                     gr.update(value=details_text, visible=True),  # constitution_details
                     gr.update(visible=True),  # result_row
-                    result  # constitution_result_display
+                    result,  # constitution_result_display
+                    result   # constitution_state - 將分析結果存儲到狀態中
                 )
         
         constitution_state = gr.State()
@@ -1292,7 +1294,7 @@ def build_constitution_analysis_page():
         analyze_btn.click(
             fn=process_and_display,
             inputs=question_components,
-            outputs=[constitution_image, constitution_title, constitution_details, result_row, constitution_result_display]
+            outputs=[constitution_image, constitution_title, constitution_details, result_row, constitution_result_display, constitution_state]
         )
         
         return constitution_result_display, constitution_state

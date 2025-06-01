@@ -2121,7 +2121,7 @@ def build_main_app():
                     """)
           # 體質分析頁面
         with gr.Column(visible=False, elem_classes=["main-content", "constitution-analysis-container"]) as constitution_page:
-            back_to_home_1 = gr.Button("🏠", elem_classes=["floating-return-button"])
+            back_to_home_1 = gr.Button("🏠 🔙", elem_classes=["floating-return-button"])
             
             # 頁面標題區域 - 減少下邊距
             gr.HTML("""
@@ -2155,7 +2155,7 @@ def build_main_app():
         
         # 養生建議頁面
         with gr.Column(visible=False, elem_classes=["main-content"]) as advice_page:
-            back_to_home_3 = gr.Button("🏠", elem_classes=["floating-return-button"])
+            back_to_home_3 = gr.Button("🏠 🔙", elem_classes=["floating-return-button"])
             
             # 添加統一的頁面標題區域
             gr.HTML("""

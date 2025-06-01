@@ -1527,7 +1527,7 @@ def build_food_recognition_page():
                     """)
                     
                     comprehensive_result_display = gr.Textbox(
-                        label="多模型綜合辨識結果",
+                        label="📋",
                         container=True,
                         show_label=True,
                         lines=15,
@@ -1545,7 +1545,7 @@ def build_food_recognition_page():
                     """)
                     
                     detailed_result_display = gr.Textbox(
-                        label="各模型詳細辨識結果",
+                        label="📋",
                         container=True,
                         show_label=True,
                         lines=15,
@@ -1677,7 +1677,7 @@ def build_food_recognition_page():
                 return error_text, f"❌ 辨識失敗: {str(e)}"        
         def update_comprehensive_result(image):
             if image is None:
-                return "", "", "請先上傳圖片"
+                return "", "", "請先上傳圖片", None
             
             try:
                 # 執行綜合辨識
@@ -1692,10 +1692,11 @@ def build_food_recognition_page():
                 
                 status = "✅ 所有模型辨識完成！" if comprehensive and "錯誤" not in comprehensive else "⚠️ 辨識遇到問題"
                 
-                return comprehensive_text, detailed_text, status
+                # 返回4個值，包括 food_state 的更新
+                return comprehensive_text, detailed_text, status, comprehensive
             except Exception as e:
                 error_text = f"❌ 辨識過程發生錯誤: {str(e)}"
-                return error_text, "", f"❌ 辨識失敗: {str(e)}"
+                return error_text, "", f"❌ 辨識失敗: {str(e)}", None
         
         def update_single_result(image, model_name):
             if image is None:
@@ -1804,7 +1805,7 @@ def build_food_recognition_page():
         recognize_all_btn.click(
             fn=update_comprehensive_result,
             inputs=[food_image],
-            outputs=[comprehensive_result_display, detailed_result_display, status_display],
+            outputs=[comprehensive_result_display, detailed_result_display, status_display, food_state],
             api_name="recognize_all_food_models",
             show_progress=True
         )
