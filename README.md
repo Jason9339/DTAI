@@ -1,5 +1,8 @@
 # 🏥 中醫食物寒熱辨識與體質分析系統
 
+## 📺 Demo 影片
+[![Demo 影片](https://img.shields.io/badge/YouTube-Demo%20影片-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/watch?v=qI0ZI-kMEPA)
+
 結合現代AI技術與傳統中醫理論，為您提供個人化的養生建議。
 
 ---
