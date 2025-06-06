@@ -48,7 +48,6 @@ chmod +x model.sh
    ```bash
    export GROQ_API_KEY=your_api_key_here
    ```
-   或者在 Gradio 界面中直接輸入 API Key。
 
 ### 5. 運行應用
 ```bash
